@@ -22,7 +22,7 @@ macro_rules! impl_number {
     };
 }
 
-impl_number!(i8, i16, i32, u8, u16, u32, f32, f64);
+impl_number!(i8, i16, i32, u8, u16, u32, f32, f64, usize, isize);
 
 impl Number for u64 {
     fn to_f64(self) -> f64 {
@@ -54,14 +54,16 @@ impl<T: Number> From<T> for Wasm {
 //
 
 impl_typeinfo! {
-    [u8,  ArrayType::U8,  Transform::Identity, false],
-    [i8,  ArrayType::I8,  Transform::Identity, false],
-    [u16, ArrayType::U16, Transform::Identity, false],
-    [i16, ArrayType::I16, Transform::Identity, false],
-    [u32, ArrayType::U32, Transform::Identity, false],
-    [u64, ArrayType::U64, Transform::AsU64,    false],
-    [i32, ArrayType::I32, Transform::Identity, false],
-    [i64, ArrayType::I64, Transform::AsI64,    false],
-    [f32, ArrayType::F32, Transform::Identity, false],
-    [f64, ArrayType::F64, Transform::Identity, false],
+    [u8,    ArrayType::U8,  Transform::Identity, false],
+    [i8,    ArrayType::I8,  Transform::Identity, false],
+    [u16,   ArrayType::U16, Transform::Identity, false],
+    [i16,   ArrayType::I16, Transform::Identity, false],
+    [u32,   ArrayType::U32, Transform::Identity, false],
+    [u64,   ArrayType::U64, Transform::AsU64,    false],
+    [i32,   ArrayType::I32, Transform::Identity, false],
+    [i64,   ArrayType::I64, Transform::AsI64,    false],
+    [f32,   ArrayType::F32, Transform::Identity, false],
+    [f64,   ArrayType::F64, Transform::Identity, false],
+    [usize, ArrayType::U32, Transform::Identity, false],
+    [isize, ArrayType::I32, Transform::Identity, false],
 }
