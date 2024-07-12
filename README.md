@@ -43,7 +43,7 @@ fn vec(count_up_to: usize) -> Result<Stash<Vec<usize>>, &'static str> {
     if count_up_to > 100 {
         return Err("I can't count that high.");
     }
-    Ok((0..count_up_to).collect::<Vec<_>>().into())
+    Ok((1..=count_up_to).collect::<Vec<_>>().into())
 }
 ```
 
@@ -75,6 +75,6 @@ rs.checked_add(2 ** 31, 2 ** 31) // -> null
 rs.str() // -> "Hello from a &'static str"
 rs.slice() // -> Float64Array[10, 20, 30]
 rs.string() // -> "Hello from a String"
-rs.vec(5) // -> Uint32Array[0, 1, 2, 3, 4]
+rs.vec(5) // -> Uint32Array[1, 2, 3, 4, 5]
 rs.vec(500) // -> Error: I can't count that high.
 ```
