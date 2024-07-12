@@ -7,7 +7,7 @@ use crate::Wasm;
 // apportion the available space of niches between them
 // to indicate None and Err return values, respectively.
 // Option uses a 0 value in the free u32 to indicate None,
-// while Result uses all remaining (nonzero( values to point
+// while Result uses all other (nonzero) values to point
 // to the error string.
 
 // From<...> for Wasm impl
