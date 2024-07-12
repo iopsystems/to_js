@@ -10,7 +10,7 @@ use crate::Wasm;
 // while Result uses all remaining (nonzero( values to point
 // to the error string.
 
-// Into<Wasm> impl via the From trait
+// From<...> for Wasm impl
 //
 
 impl<T: HasNiche> From<Option<T>> for Wasm {
@@ -46,7 +46,7 @@ impl<T: HasNiche, E: ErrorString> From<Option<Result<T, E>>> for Wasm {
     }
 }
 
-// Wrappable impl
+// HasNiche impl
 // (none since these types are the wrappers; they cannot themselves be wrapped)
 
 // TypeInfo impl

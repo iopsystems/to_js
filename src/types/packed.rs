@@ -16,7 +16,7 @@ pub struct U32Pair(pub [u32; 2]);
 pub struct I32Pair(pub [i32; 2]);
 pub struct F32Pair(pub [f32; 2]);
 
-// Into<Wasm> impl via the From trait
+// From<...> for Wasm impl
 //
 
 impl From<U8Octet> for Wasm {
@@ -75,7 +75,7 @@ impl From<F32Pair> for Wasm {
     }
 }
 
-// Wrappable impl
+// HasNiche impl
 // (none since these types has no available niche; all 64 bits are meaningful)
 
 // TypeInfo impl

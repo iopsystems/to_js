@@ -2,7 +2,7 @@ use crate::typeinfo::{ArrayType, Transform};
 use crate::niche::{Niche, HasNiche};
 use crate::Wasm;
 
-// Into<Wasm> impl via the From trait
+// From<...> for Wasm impl
 //
 
 impl From<bool> for Wasm {
@@ -11,7 +11,7 @@ impl From<bool> for Wasm {
     }
 }
 
-// Wrappable impl
+// HasNiche impl
 //
 
 impl HasNiche for bool {

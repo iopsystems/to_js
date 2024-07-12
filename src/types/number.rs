@@ -36,7 +36,7 @@ impl Number for i64 {
     }
 }
 
-// Into<Wasm> impl via the From trait
+// From<...> for Wasm impl
 //
 
 impl<T: Number> From<T> for Wasm {
@@ -45,7 +45,7 @@ impl<T: Number> From<T> for Wasm {
     }
 }
 
-// Wrappable impl
+// HasNiche impl
 // (There's no blanket implementation for Number since since not *all* numbers
 //  are niche; u64 and i64 have no available niche. We implemented it for
 //  all supported primitives using the impl_number! macro.)

@@ -1,6 +1,6 @@
 # To JS
 
-A small package for simple WebAssembly-to-JavaScript exports for numbers, typed arrays, and strings. Supports returning `Option` and `Result` values, which can return `null` and throw an error, respectively. Typed arrays can be returned as views of Rust memory, avoiding copies of their data.
+A small package for simple WebAssembly-to-JavaScript exports for numbers, typed arrays, and strings. Supports returning `Option` and `Result` values, which can return `null` and throw an error, respectively. Typed arrays can be returned as views of Rust memory, avoiding data copies.
 
 ## Examples
 
@@ -52,8 +52,8 @@ fn vec(count_up_to: usize) -> Result<Stash<Vec<usize>>, &'static str> {
 ```js
 // Given a WebAssembly instance, return an object containing its #[js] exports.
 // If the optional second argument is true, typed arrays will be copied out of
-// the WebAssembly memory space upon return, enhancing ease-of-use at the cost
-// of performing the data copies.
+// WebAssembly memory before being returned, enhancing ease-of-use at the cost
+// of the extra data copies.
 function toJs(instance, alwaysCopyData) {
   const buffer = instance.exports.memory.buffer;
   const view = new DataView(buffer);
@@ -69,12 +69,12 @@ const rs = await WebAssembly.instantiateStreaming(
   fetch(url /* url to the compiled .wasm file */)
 ).then((results) => toJs(results.instance))
 
-rs.add(2, 2) // -> 4
-rs.checked_add(2, 2) // -> 4
-rs.checked_add(2 ** 31, 2 ** 31) // -> null
-rs.str() // -> "Hello from a &'static str"
-rs.slice() // -> Float64Array[10, 20, 30]
-rs.string() // -> "Hello from a String"
-rs.vec(5) // -> Uint32Array[1, 2, 3, 4, 5]
-rs.vec(500) // -> Error: I can't count that high.
+rs.add(2, 2) // => 4
+rs.checked_add(2, 2) // => 4
+rs.checked_add(2 ** 31, 2 ** 31) // => null
+rs.str() // => "Hello from a &'static str"
+rs.slice() // => Float64Array[10, 20, 30]
+rs.string() // => "Hello from a String"
+rs.vec(5) // => Uint32Array[1, 2, 3, 4, 5]
+rs.vec(500) // => Error: I can't count that high.
 ```

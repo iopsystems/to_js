@@ -3,7 +3,7 @@ use crate::types::number::Number;
 use crate::niche::{Niche, HasNiche};
 use crate::Wasm;
 
-// Into<Wasm> impl via the From trait
+// From<...> for Wasm impl
 //
 
 impl<T: Number> From<&Vec<T>> for Wasm {
@@ -12,7 +12,7 @@ impl<T: Number> From<&Vec<T>> for Wasm {
     }
 }
 
-// Wrappable impl
+// HasNiche impl
 //
 
 impl<T: Number> HasNiche for &Vec<T> {

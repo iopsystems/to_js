@@ -3,7 +3,7 @@ use crate::typeinfo::{ArrayType, Transform};
 use crate::Wasm;
 use std::ffi::{CStr, CString};
 
-// Into<Wasm> impl via the From trait
+// From<...> for Wasm impl
 //
 
 impl From<&String> for Wasm {
@@ -30,7 +30,7 @@ impl From<&CString> for Wasm {
     }
 }
 
-// Wrappable impl
+// HasNiche impl
 //
 
 impl HasNiche for &String {

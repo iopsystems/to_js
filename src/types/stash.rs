@@ -15,7 +15,7 @@ impl<T> From<T> for Stash<T> {
     }
 }
 
-// Into<Wasm> impl via the From trait
+// From<...> for Wasm impl
 //
 
 impl<T> From<Stash<T>> for Wasm
@@ -32,7 +32,7 @@ where
     }
 }
 
-// Wrappable impl
+// HasNiche impl
 //
 
 impl<T> HasNiche for Stash<T>
