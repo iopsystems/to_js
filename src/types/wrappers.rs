@@ -17,7 +17,7 @@ impl<T: HasNiche> From<Option<T>> for Wasm {
     fn from(x: Option<T>) -> Self {
         match x {
             Some(x) => x.into(),
-            None => T::N.value(0),
+            None => T::N.new(0),
         }
     }
 }
@@ -32,7 +32,7 @@ impl<T: HasNiche, E: ErrorString> From<Result<T, E>> for Wasm {
     fn from(x: Result<T, E>) -> Self {
         match x {
             Ok(value) => value.into(),
-            Err(e) => T::N.value(e.to_u32()),
+            Err(e) => T::N.new(e.to_u32()),
         }
     }
 }
