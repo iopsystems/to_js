@@ -1,6 +1,6 @@
 # To JS
 
-A small package for simple WebAssembly-to-JavaScript exports for numbers, typed arrays, and strings. Supports returning `Option` and `Result` values, which return `null` and throw an error, respectively. Typed arrays can be returned as views of Rust memory, avoiding copies of their data.
+A small package for simple WebAssembly-to-JavaScript exports for numbers, typed arrays, and strings. Supports returning `Option` and `Result` values, which can return `null` and throw an error, respectively. Typed arrays can be returned as views of Rust memory, avoiding copies of their data.
 
 ## Examples
 
