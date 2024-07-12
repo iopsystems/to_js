@@ -39,11 +39,16 @@ fn string() -> Stash<String> {
 }
 
 #[js]
-fn vec(count_up_to: usize) -> Result<Stash<Vec<usize>>, &'static str> {
+fn vec(count_up_to: usize) -> Stash<Vec<usize>> {
+    (1..=count_up_to).collect::<Vec<_>>().into()
+}
+
+#[js]
+fn vec_result(count_up_to: usize) -> Result<Stash<Vec<usize>>, &'static str> {
     if count_up_to > 100 {
         return Err("I can't count that high.");
     }
-    Ok((1..=count_up_to).collect::<Vec<_>>().into())
+    Ok(vec(count_up_to))
 }
 ```
 
@@ -76,5 +81,6 @@ rs.str() // => "Hello from a &'static str"
 rs.slice() // => Float64Array[10, 20, 30]
 rs.string() // => "Hello from a String"
 rs.vec(5) // => Uint32Array[1, 2, 3, 4, 5]
-rs.vec(500) // => Error: I can't count that high.
+rs.vec_result(5) // => Uint32Array[1, 2, 3, 4, 5]
+rs.vec_result(500) // => Error: I can't count that high.
 ```
