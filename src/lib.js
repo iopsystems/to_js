@@ -32,6 +32,9 @@ function toJs(instance, alwaysCopyData) {
     const asU64 = (x) => asArray(x, 7)[0];
     const asI64 = (x) => asArray(x, 8)[0];
 
+    const textDecoder = new TextDecoder();
+    const instanceExports = instance.exports;
+
     // In enum variant order (OutputTransform)
     const outputTransforms = [
         u8Octet,
@@ -46,14 +49,13 @@ function toJs(instance, alwaysCopyData) {
         (x) => x,
         (x) => {},
         Boolean,
-        (x) => new TextDecoder().decode(x),
-        (x) => cString(u32Pair(x)[0]),
+        (x) => textDecoder.decode(x),
     ];
 
-    function cString(buffer, ptr) {
-        const bytes = new Uint8Array(buffer, ptr);
+    function cString(ptr) {
+        const bytes = new Uint8Array(instanceExports.memory.buffer, ptr);
         const end = bytes.findIndex((d) => d === 0);
-        return bytes.subarray(0, end);
+        return textDecoder.decode(bytes.subarray(0, end));
     }
 
     function throwError(ptr) {
@@ -80,23 +82,21 @@ function toJs(instance, alwaysCopyData) {
         return pair[0] === 0 && pair[1] === 0;
     }
 
-    const instanceExports = instance.exports;
-
     return Object.fromEntries(
         Object.keys(instanceExports)
             .filter((d) => d.endsWith("_info_"))
             .map((nameWithSuffix) => {
                 const name = nameWithSuffix.slice(0, -6);
-                const [isResult, isOption, isArray, arrayType, transform, isMulti] =
+                const [isResult, isOption, isArray, arrayType, transform] =
                     u8Octet(instanceExports[`${name}_info_`]());
                 const numArgs = instanceExports[name].length;
                 const args = Array.from({ length: numArgs }, (_, i) => `x${i + 1}`);
                 const argsAsString = args.join(", ");
-                const needsPair = isResult || isOption || isArray || isMulti;
+                const needsPair = isResult || isOption || isArray;
                 const isPackedArray = transform < 7;
                 const isIdentityTransform = transform === 9;
                 const slice = alwaysCopyData && (isPackedArray || (isArray && isIdentityTransform));
-                const fn = new Function(`exports`, `tryResult`, `tryOption`, `transform`, `u32Pair`, `
+                const fn = new Function(`exports`, `tryResult`, `tryOption`, `outputTransform`, `u32Pair`, `
                 return function(${argsAsString}) {
                     if (arguments.length !== ${args.length}) {
                         throw new Error(\`expected ${args.length} arguments, got \${arguments.length}\`);
@@ -105,11 +105,8 @@ function toJs(instance, alwaysCopyData) {
                     ${needsPair ? `const pair = u32Pair(value);` : ``}
                     ${isResult ? `tryResult(pair);` : ``}
                     ${isOption ? `if (tryOption(pair)) return null;` : ``}
-                    const ret = transform(
-                        ${isArray
-                        ? `new ${arrayTypes[arrayType].name}(exports.memory.buffer, pair[0], pair[1])` 
-                        : `value`}
-                    );
+                    ${isArray ? `value = new ${arrayTypes[arrayType].name}(exports.memory.buffer, pair[0], pair[1])` : ``}
+                    const ret = outputTransform(value);
                     return ${slice ? `ret.slice()` : `ret`}
                 }`);
                 return [

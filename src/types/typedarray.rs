@@ -1,7 +1,7 @@
+use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{Info, TypeInfo};
-use crate::types::packed::U32Pair;
 use crate::types::number::Number;
-use crate::niche::{Niche, HasNiche};
+use crate::types::packed::U32Pair;
 use crate::Wasm;
 
 // Into<Wasm> impl via the From trait

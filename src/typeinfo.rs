@@ -37,7 +37,6 @@ pub enum Transform {
     Void,
     Bool,
     String,
-    CString,
 }
 
 pub struct Info {

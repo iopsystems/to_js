@@ -16,7 +16,6 @@ pub(crate) trait ErrorString {
 
 impl ErrorString for () {
     fn to_u32(self) -> u32 {
-        // Note: we do not return the empty string, since that might
         c"".to_u32()
     }
 }
@@ -24,7 +23,12 @@ impl ErrorString for () {
 impl ErrorString for String {
     fn to_u32(self) -> u32 {
         match CString::new(self) {
-            Ok(value) => value.to_u32(),
+            Ok(value) => {
+                // The Wasm encoding of a CString is a (ptr, len) pair
+                let wasm = Wasm::from(Stash(value)).value();
+                // Extract and return the ptr, which is stored in the low bits
+                wasm.to_bits() as u32
+            }
             Err(_) => c"Meta-error: The original error string contained a NUL byte.".to_u32(),
         }
     }
@@ -38,8 +42,7 @@ impl ErrorString for &str {
 
 impl ErrorString for CString {
     fn to_u32(self) -> u32 {
-        // The Wasm encoding of a stashed CString is a 32-bit pointer
-        Wasm::from(Stash(self)).value() as u32
+        self.as_c_str().to_u32()
     }
 }
 

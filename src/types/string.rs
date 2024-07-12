@@ -1,5 +1,5 @@
+use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform};
-use crate::niche::{Niche, HasNiche};
 use crate::Wasm;
 use std::ffi::{CStr, CString};
 
@@ -20,13 +20,13 @@ impl From<&str> for Wasm {
 
 impl From<&CStr> for Wasm {
     fn from(x: &CStr) -> Self {
-        x.as_ptr().into() // Note: This encoding is relied on by ErrorString
+        x.to_bytes().into()
     }
 }
 
 impl From<&CString> for Wasm {
     fn from(x: &CString) -> Self {
-        x.as_c_str().into()
+        x.as_bytes().into()
     }
 }
 
@@ -53,8 +53,8 @@ impl HasNiche for &CString {
 //
 
 impl_typeinfo! {
-    [&String,  ArrayType::U8,   Transform::String,  true],
-    [&str,     ArrayType::U8,   Transform::String,  true],
-    [&CString, ArrayType::None, Transform::CString, false],
-    [&CStr,    ArrayType::None, Transform::CString, false],
+    [&String,  ArrayType::U8, Transform::String, true],
+    [&str,     ArrayType::U8, Transform::String, true],
+    [&CString, ArrayType::U8, Transform::String, true],
+    [&CStr,    ArrayType::U8, Transform::String, true],
 }
