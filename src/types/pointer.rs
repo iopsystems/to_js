@@ -1,5 +1,5 @@
+use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Info, Transform, TypeInfo};
-use crate::niche::{Niche, HasNiche};
 use crate::Wasm;
 
 // From<...> for Wasm impl
@@ -33,12 +33,12 @@ impl<T> HasNiche for *mut T {
 
 impl<T> TypeInfo for *const T {
     fn type_info() -> Info {
-        Info::new(ArrayType::None, Transform::Identity, false)
+        Info::new(ArrayType::None, false, Transform::Identity)
     }
 }
 
 impl<T> TypeInfo for *mut T {
     fn type_info() -> Info {
-        Info::new(ArrayType::None, Transform::Identity, false)
+        Info::new(ArrayType::None, false, Transform::Identity)
     }
 }

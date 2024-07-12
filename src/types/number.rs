@@ -54,16 +54,16 @@ impl<T: Number> From<T> for Wasm {
 //
 
 impl_typeinfo! {
-    [u8,    ArrayType::U8,  Transform::Identity, false],
-    [i8,    ArrayType::I8,  Transform::Identity, false],
-    [u16,   ArrayType::U16, Transform::Identity, false],
-    [i16,   ArrayType::I16, Transform::Identity, false],
-    [u32,   ArrayType::U32, Transform::Identity, false],
-    [u64,   ArrayType::U64, Transform::AsU64,    false],
-    [i32,   ArrayType::I32, Transform::Identity, false],
-    [i64,   ArrayType::I64, Transform::AsI64,    false],
-    [f32,   ArrayType::F32, Transform::Identity, false],
-    [f64,   ArrayType::F64, Transform::Identity, false],
-    [usize, ArrayType::U32, Transform::Identity, false],
-    [isize, ArrayType::I32, Transform::Identity, false],
+    [u8,    ArrayType::U8,  false, Transform::Identity],
+    [i8,    ArrayType::I8,  false, Transform::Identity],
+    [u16,   ArrayType::U16, false, Transform::Identity],
+    [i16,   ArrayType::I16, false, Transform::Identity],
+    [u32,   ArrayType::U32, false, Transform::Identity],
+    [u64,   ArrayType::U64, false, Transform::AsU64],
+    [i32,   ArrayType::I32, false, Transform::Identity],
+    [i64,   ArrayType::I64, false, Transform::AsI64],
+    [f32,   ArrayType::F32, false, Transform::Identity],
+    [f64,   ArrayType::F64, false, Transform::Identity],
+    [usize, ArrayType::U32, false, Transform::Identity],
+    [isize, ArrayType::I32, false, Transform::Identity],
 }

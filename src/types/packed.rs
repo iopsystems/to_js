@@ -82,11 +82,11 @@ impl From<F32Pair> for Wasm {
 //
 
 impl_typeinfo! {
-    [U8Octet,    ArrayType::None, Transform::U8Octet,    false],
-    [I8Octet,    ArrayType::None, Transform::I8Octet,    false],
-    [U16Quartet, ArrayType::None, Transform::U16Quartet, false],
-    [I16Quartet, ArrayType::None, Transform::I16Quartet, false],
-    [U32Pair,    ArrayType::None, Transform::U32Pair,    false],
-    [I32Pair,    ArrayType::None, Transform::I32Pair,    false],
-    [F32Pair,    ArrayType::None, Transform::F32Pair,    false],
+    [U8Octet,    ArrayType::None, false, Transform::U8Octet],
+    [I8Octet,    ArrayType::None, false, Transform::I8Octet],
+    [U16Quartet, ArrayType::None, false, Transform::U16Quartet],
+    [I16Quartet, ArrayType::None, false, Transform::I16Quartet],
+    [U32Pair,    ArrayType::None, false, Transform::U32Pair],
+    [I32Pair,    ArrayType::None, false, Transform::I32Pair],
+    [F32Pair,    ArrayType::None, false, Transform::F32Pair],
 }

@@ -1,5 +1,5 @@
+use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform};
-use crate::niche::{Niche, HasNiche};
 use crate::Wasm;
 
 // From<...> for Wasm impl
@@ -21,4 +21,4 @@ impl HasNiche for () {
 // TypeInfo impl
 //
 
-impl_typeinfo!([(), ArrayType::None, Transform::Void, false]);
+impl_typeinfo!([(), ArrayType::None, false, Transform::Void]);

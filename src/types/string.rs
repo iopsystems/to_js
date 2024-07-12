@@ -53,8 +53,8 @@ impl HasNiche for &CString {
 //
 
 impl_typeinfo! {
-    [&String,  ArrayType::U8, Transform::String, true],
-    [&str,     ArrayType::U8, Transform::String, true],
-    [&CString, ArrayType::U8, Transform::String, true],
-    [&CStr,    ArrayType::U8, Transform::String, true],
+    [&String,  ArrayType::U8, true, Transform::String],
+    [&str,     ArrayType::U8, true, Transform::String],
+    [&CString, ArrayType::U8, true, Transform::String],
+    [&CStr,    ArrayType::U8, true, Transform::String],
 }

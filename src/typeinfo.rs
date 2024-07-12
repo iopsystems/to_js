@@ -49,7 +49,7 @@ pub struct Info {
 
 // Helper functions to upgrade a basic type into an array, option, and/or result.
 impl Info {
-    pub fn new(array_type: ArrayType, transform: Transform, is_array: bool) -> Self {
+    pub fn new(array_type: ArrayType, is_array: bool, transform: Transform) -> Self {
         Self {
             array_type: array_type,
             transform,
@@ -113,11 +113,11 @@ pub trait TypeInfo {
 
 #[macro_export]
 macro_rules! impl_typeinfo {
-    ($( [$type:ty, $array_type:expr, $transform:expr, $is_array:ident] $(,)? )*) => {
+    ($( [$type:ty, $array_type:expr, $is_array:ident, $transform:expr] $(,)? )*) => {
         $(
             impl $crate::typeinfo::TypeInfo for $type {
                 fn type_info() -> $crate::typeinfo::Info {
-                    $crate::typeinfo::Info::new($array_type, $transform, $is_array)
+                    $crate::typeinfo::Info::new($array_type, $is_array, $transform)
                 }
             }
         )*
