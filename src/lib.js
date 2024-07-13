@@ -62,24 +62,26 @@ function toJs(instance, alwaysCopyData) {
         throw new Error(cString(ptr));
     }
 
-    function tryResultNaNStyle(pair) {
-        if (pair[0] !== 0 && pair[1] === 0xfff80000) {
+    // Implement decoding for both niche strategies
+
+    function tryResultHighBitsNaN(pair) {
+        if (pair[0] !== 1 && pair[1] === 0xfff80000) {
             throwError(pair[0]);
         }
     }
 
-    function tryResultNullPtrStyle(pair) {
-        if (pair[0] === 0 && pair[1] !== 0) {
+    function tryResultLowBitsOne(pair) {
+        if (pair[0] === 1 && pair[1] !== 0) {
             throwError(pair[1]);
         }
     }
 
-    function tryOptionNaNStyle(pair) {
+    function tryOptionHighBitsNaN(pair) {
         return pair[0] === 0 && pair[1] === 0xfff80000;
     }
 
-    function tryOptionNullPtrStyle(pair) {
-        return pair[0] === 0 && pair[1] === 0;
+    function tryOptionLowBitsOne(pair) {
+        return pair[0] === 0 && pair[1] === 1;
     }
 
     return Object.fromEntries(
@@ -113,8 +115,8 @@ function toJs(instance, alwaysCopyData) {
                     name,
                     fn(
                         instanceExports,
-                        isResult && (isArray ? tryResultNullPtrStyle : tryResultNaNStyle),
-                        isOption && (isArray ? tryOptionNullPtrStyle : tryOptionNaNStyle),
+                        isResult && (isArray ? tryResultLowBitsOne : tryResultHighBitsNaN),
+                        isOption && (isArray ? tryOptionLowBitsOne : tryOptionHighBitsNaN),
                         outputTransforms[transform],
                         u32Pair
                     )

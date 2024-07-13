@@ -35,19 +35,19 @@ impl<T: Number> From<&mut Box<[T]>> for Wasm {
 //
 
 impl<T: Number> HasNiche for &[T] {
-    const N: Niche = Niche::LowBitsZero;
+    const N: Niche = Niche::LowBitsOne;
 }
 
 impl<T: Number> HasNiche for &mut [T] {
-    const N: Niche = Niche::LowBitsZero;
+    const N: Niche = Niche::LowBitsOne;
 }
 
 impl<T: Number> HasNiche for &Box<[T]> {
-    const N: Niche = Niche::LowBitsZero;
+    const N: Niche = Niche::LowBitsOne;
 }
 
 impl<T: Number> HasNiche for &mut Box<[T]> {
-    const N: Niche = Niche::LowBitsZero;
+    const N: Niche = Niche::LowBitsOne;
 }
 
 // TypeInfo impl

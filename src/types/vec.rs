@@ -16,7 +16,7 @@ impl<T: Number> From<&Vec<T>> for Wasm {
 //
 
 impl<T: Number> HasNiche for &Vec<T> {
-    const N: Niche = Niche::LowBitsZero;
+    const N: Niche = Niche::LowBitsOne;
 }
 
 // TypeInfo impl

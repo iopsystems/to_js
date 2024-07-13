@@ -9,9 +9,11 @@ pub(crate) enum Niche {
     /// Signal that we're inside the niche by setting the high bits to those of a signaling NaN,
     /// and encode the associated value in the low bits.
     HighBitsNaN,
-    /// Signal that we're inside the niche by setting the low bits to zero, and encode the associated
-    /// value in the high bits.
-    LowBitsZero,
+
+    /// Signal that we're inside the niche by setting the low bits to 0x0001, and encode the associated
+    /// value in the high bits. This is intended for use with types for which a byte-aligned pointer
+    /// would typically be encoded into the low bits.
+    LowBitsOne,
 }
 
 impl Niche {
@@ -19,7 +21,7 @@ impl Niche {
         const SIGNALING_NAN: u64 = 0xfff80000_00000000;
         match self {
             Self::HighBitsNaN => f64::from_bits(SIGNALING_NAN | x as u64).into(),
-            Self::LowBitsZero => U32Pair([0, x]).into(),
+            Self::LowBitsOne => U32Pair([1, x]).into(),
         }
     }
 }

@@ -34,11 +34,11 @@ impl From<&CString> for Wasm {
 //
 
 impl HasNiche for &String {
-    const N: Niche = Niche::LowBitsZero;
+    const N: Niche = Niche::LowBitsOne;
 }
 
 impl HasNiche for &str {
-    const N: Niche = Niche::LowBitsZero;
+    const N: Niche = Niche::LowBitsOne;
 }
 
 impl HasNiche for &CStr {
