@@ -64,17 +64,9 @@ pub fn allocate<T>(x: T) -> *mut T {
     Box::into_raw(Box::new(x))
 }
 
-pub unsafe fn as_ref<'a, T>(ptr: *const T) -> &'a T {
-    unsafe { &*ptr }
-}
-
-pub unsafe fn as_mut_ref<'a, T>(ptr: *mut T) -> &'a mut T {
-    unsafe { &mut *ptr }
-}
-
 pub unsafe fn deallocate<T>(ptr: *mut T) {
     let x = unsafe { Box::from_raw(ptr) };
-    drop(x)
+    drop(x) // strictly speaking, we could omit this, but we include it for clarity.
 }
 
 /// A trick: We embed most of the JavaScript required to use the compiled .wasm file inside of the file itself by
