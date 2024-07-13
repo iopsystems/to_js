@@ -10,9 +10,15 @@ strip = "debuginfo"
 debug = "line-tables-only"
 overflow-checks = true # cf. https://hachyderm.io/@cliffle/111812887172594381
 
+# Run with: cargo build --target wasm32-unknown-unknown --profile release-debug
+[profile.release-debug]
+inherits = "release"
+debug-assertions = true
+
 [dependencies]
 js_proc_macro = { path = "./js_proc_macro" }
 
 [features]
 default = ["proc-macro"]
 proc-macro = []
+

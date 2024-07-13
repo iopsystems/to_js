@@ -23,7 +23,7 @@ pub enum Transform {
     // Store the "array" Transforms used for packed arrays
     // in the same order (with the same discriminant) as the
     // corresponding ArrayType so that the JavaScript code can
-    // more transparently map between the two via their indexes.
+    // concisely map between the two enums via their indexes.
     U8Octet = ArrayType::U8 as isize,
     I8Octet = ArrayType::I8 as isize,
     U16Quartet = ArrayType::U16 as isize,
@@ -51,7 +51,7 @@ pub struct Info {
 impl Info {
     pub fn new(array_type: ArrayType, is_array: bool, transform: Transform) -> Self {
         Self {
-            array_type: array_type,
+            array_type,
             transform,
             is_array,
             is_option: false,
@@ -60,6 +60,8 @@ impl Info {
     }
 
     pub(crate) fn array(self) -> Info {
+        // If array_type is None, then this type cannot be placed into a (typed) array.
+        // An example of this is U32Pair; we cannot ship &[U32Pair] across the FFI boundary.
         debug_assert!(!matches!(self.array_type, ArrayType::None));
         debug_assert!(!self.is_array);
         Info {
