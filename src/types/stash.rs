@@ -1,5 +1,5 @@
+use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{Info, TypeInfo};
-use crate::niche::{Niche, HasNiche};
 use crate::Wasm;
 use std::sync::RwLock;
 
@@ -45,6 +45,7 @@ where
 
 // TypeInfo impl
 //
+
 impl<T> TypeInfo for Stash<T>
 where
     for<'a> &'a T: TypeInfo,
