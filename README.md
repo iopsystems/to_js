@@ -58,14 +58,14 @@ fn vec_result(count_up_to: usize) -> Result<Stash<Vec<usize>>, &'static str> {
 // Given a WebAssembly instance, return an object containing its #[js] exports.
 // If the optional second argument is true, typed arrays will be copied out of
 // WebAssembly memory before being returned, enhancing ease-of-use at the cost
-// of the extra data copies.
+// of extra data copies.
 function toJs(instance, alwaysCopyData) {
   const buffer = instance.exports.memory.buffer;
   const view = new DataView(buffer);
   const ptr = view.getUint32(instance.exports.JS, true);
   const len = view.getUint32(instance.exports.JS + 4, true);
-  const code = new TextDecoder().decode(buffer.slice(ptr + 3, ptr + len));
-  return import(code).then((module) =>
+  const code = new TextDecoder().decode(buffer.slice(ptr, ptr + len));
+  return import("data:text/javascript," + code).then((module) =>
     module.default(instance, alwaysCopyData)
   );
 }

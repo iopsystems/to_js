@@ -1,5 +1,4 @@
-// data:text/javascript, export default
-function toJs(instance, alwaysCopyData) {
+export default function toJs(instance, alwaysCopyData) {
     // In enum variant order (ArrayType)
     const arrayTypes = [
         Uint8Array,
@@ -101,7 +100,7 @@ function toJs(instance, alwaysCopyData) {
                 const fn = new Function(`exports`, `tryResult`, `tryOption`, `outputTransform`, `u32Pair`, `
                 return function(${argsAsString}) {
                     if (arguments.length !== ${args.length}) {
-                        throw new Error(\`expected ${args.length} arguments, got \${arguments.length}\`);
+                        throw new Error(\`expected ${args.length} arguments, got \${arguments.length} arguments\`);
                     }
                     let value = exports.${name}(${argsAsString});
                     ${needsPair ? `const pair = u32Pair(value);` : ``}

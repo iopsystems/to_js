@@ -77,9 +77,9 @@ pub unsafe fn deallocate<T>(ptr: *mut T) {
     drop(x)
 }
 
-/// A trick: We embed most of the JavaScript required to use the compiled .wasm file inside inside the .wasm file.
-/// We export this constant directly into the resulting .wasm binary, where its value points to the slice descriptor.
-/// The first element of the descriptor is a pointer to the string contents, and the second element is its length.
+/// A trick: We embed most of the JavaScript required to use the compiled .wasm file inside of the file itself by
+/// exporting this constant directly. Its value is a two-element slice descriptor whose first element is a pointer
+/// to the string contents and whose second element is the string's length.
 #[used]
 #[export_name = "JS"]
 pub static JS: &[u8] = &include_bytes!("./lib.js").as_slice();
