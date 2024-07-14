@@ -4,19 +4,23 @@ use crate::Wasm;
 // From<...> for Wasm impl
 //
 
-pub struct Dynamic<T>(T);
+pub struct Dynamic<T>(pub T);
 
 impl<T> From<Dynamic<T>> for Wasm
 where
-    for<'a> &'a T: Into<Wasm>,
+    Wasm: From<T>,
     T: TypeInfo,
 {
     fn from(x: Dynamic<T>) -> Self {
-        let wasm = (&x.0).into();
-        let info = T::type_info();
-        info.to_u32().into()
+        // let wasm = Wasm::from(x.0);
+        // let wasm = Stash(x).into();
+        // let info = T::type_info();
+        // [info, wasm].into()
+        123.4.into()
     }
 }
+
+// idea: return a single Dynamic as F64Array[wasm, typeinfo]. But how do we stash both this and the original item?
 
 // HasNiche impl
 //
@@ -26,7 +30,7 @@ where
 
 impl<T> TypeInfo for Dynamic<T> {
     fn type_info() -> Info {
-        Info::new(ArrayType::None, false, Transform::Dynamic)
+        Info::new(ArrayType::F64, false, Transform::Dynamic)
     }
 }
 

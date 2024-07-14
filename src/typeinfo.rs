@@ -1,6 +1,8 @@
 // TypeInfo impl so that the JavaScript code can correctly handle values of every supported type
 //
 
+use crate::{U8Octet, Wasm};
+
 // TypedArray type if the return value is to be converted to a typed array
 // Variant order is mirrored in an array on the JavaScript side.
 pub enum ArrayType {
@@ -93,20 +95,23 @@ impl Info {
             ..self
         }
     }
-
-    pub fn to_u32(self) -> u32 {
-        u8_quartet_to_u32([
-            (self.is_result as u8) | ((self.is_option as u8) << 1),
-            self.is_array as u8,
-            self.array_type as u8,
-            self.transform as u8,
-        ])
-    }
 }
 
-fn u8_quartet_to_u32(x: [u8; 4]) -> u32 {
-    let [a, b, c, d] = x;
-    ((d as u32) << 24) | ((c as u32) << 16) | ((b as u32) << 8) | a as u32
+impl From<Info> for Wasm {
+    fn from(x: Info) -> Self {
+        // Encode the type info in the bottom 32 bits
+        U8Octet([
+            (x.is_result as u8) | ((x.is_option as u8) << 1),
+            x.is_array as u8,
+            x.array_type as u8,
+            x.transform as u8,
+            0,
+            0,
+            0,
+            0,
+        ])
+        .into()
+    }
 }
 
 // Trait representing the ability to get type info for a type.

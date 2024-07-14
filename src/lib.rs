@@ -49,11 +49,8 @@ macro_rules! to_js {
                 // Define a companion function which returns the info needed to interpret the encoding.
                 #[export_name = concat!(stringify!($name), "_info_")]
                 pub extern "C" fn type_info() -> f64 {
-                    // Convert the typeinfo from a u32 to a u8 octet which the JavaScript code expects.
                     let info = <$ret as TypeInfo>::type_info();
-                    let [a, b, c, d] = info.to_u32().to_le_bytes();
-                    let octet = [a, b, c, d, 0, 0, 0, 0];
-                    Wasm::from(U8Octet(octet)).value()
+                    Wasm::from(info).value()
                 }
             };
         )*
