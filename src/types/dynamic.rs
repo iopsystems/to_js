@@ -4,23 +4,17 @@ use crate::Wasm;
 // From<...> for Wasm impl
 //
 
-pub struct Dynamic<T>(pub T);
-
-impl<T> Dynamic<T>
-where
-    T: Into<Wasm>,
-{
-    pub fn new(x: T) -> Self {
-        Dynamic(x)
-    }
-}
+pub struct Dynamic<T>(T);
 
 impl<T> From<Dynamic<T>> for Wasm
 where
-    T: Into<Wasm>,
+    for<'a> &'a T: Into<Wasm>,
+    T: TypeInfo,
 {
     fn from(x: Dynamic<T>) -> Self {
-        x.0.into()
+        let wasm = (&x.0).into();
+        let info = T::type_info();
+        info.to_u32().into()
     }
 }
 
@@ -30,10 +24,7 @@ where
 // TypeInfo impl
 //
 
-impl<T> TypeInfo for Dynamic<T>
-where
-    T: Into<Wasm>,
-{
+impl<T> TypeInfo for Dynamic<T> {
     fn type_info() -> Info {
         Info::new(ArrayType::None, false, Transform::Dynamic)
     }

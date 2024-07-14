@@ -94,19 +94,19 @@ impl Info {
         }
     }
 
-    pub fn to_octet(self) -> [u8; 8] {
-        let flags: u8 = (self.is_result as u8) | ((self.is_option as u8) << 1);
-        [
-            flags,
+    pub fn to_u32(self) -> u32 {
+        u8_quartet_to_u32([
+            (self.is_result as u8) | ((self.is_option as u8) << 1),
             self.is_array as u8,
             self.array_type as u8,
             self.transform as u8,
-            0,
-            0,
-            0,
-            0,
-        ]
+        ])
     }
+}
+
+fn u8_quartet_to_u32(x: [u8; 4]) -> u32 {
+    let [a, b, c, d] = x;
+    ((d as u32) << 24) | ((c as u32) << 16) | ((b as u32) << 8) | a as u32
 }
 
 // Trait representing the ability to get type info for a type.
