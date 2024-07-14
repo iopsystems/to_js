@@ -1,4 +1,5 @@
 mod bool;
+pub(crate) mod dynamic;
 mod errorstring;
 mod number;
 pub(crate) mod packed;

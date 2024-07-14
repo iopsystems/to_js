@@ -10,6 +10,7 @@ mod niche;
 mod types;
 
 pub use typeinfo::TypeInfo;
+pub use types::dynamic::Dynamic;
 pub use types::packed::*;
 pub use types::stash::Stash;
 
