@@ -98,9 +98,9 @@ export default function toJs(instance, alwaysCopyData) {
                 const isIdentityTransform = transform === 9;
                 const slice = alwaysCopyData && (isPackedArray || (isArray && isIdentityTransform));
                 const fn = new Function(`exports`, `tryResult`, `tryOption`, `outputTransform`, `u32Pair`, `
-                return function(${argsAsString}) {
+                return function ${name}(${argsAsString}) {
                     if (arguments.length !== ${args.length}) {
-                        throw new Error(\`expected ${args.length} arguments, got \${arguments.length} arguments\`);
+                        throw new Error(\`${name}: expected ${args.length} argument${args.length === 1 ? '' : 's'}, got \${arguments.length}\`);
                     }
                     let value = exports.${name}(${argsAsString});
                     ${needsPair ? `const pair = u32Pair(value);` : ``}
