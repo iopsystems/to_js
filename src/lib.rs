@@ -12,7 +12,7 @@ mod types;
 pub use typeinfo::TypeInfo;
 pub use types::dynamic::Dynamic;
 pub use types::packed::*;
-pub use types::stash::Stash;
+pub use types::stash::{clear_stash, Stash};
 
 // Core struct that represents values that can be returned across the FFI boundary
 pub struct Wasm(f64);
@@ -42,6 +42,7 @@ macro_rules! to_js {
                 // Define the exported function, which returns an f64-encoded Wasm value
                 #[export_name = concat!(stringify!($name))]
                 pub extern "C" fn call($($arg: $typ),*) -> f64 {
+                    $crate::clear_stash();
                     let value = $name($($arg),*);
                     Wasm::from(value).value()
                 }

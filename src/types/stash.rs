@@ -3,9 +3,17 @@ use crate::typeinfo::{Info, TypeInfo};
 use crate::Wasm;
 use std::sync::RwLock;
 
+// todo: update this comment for the fact that we now store a vec
 // Global stash to keep values alive across FFI boundary until the next FFI call,
 // storing them in a type-erased box to be dropped when the next value is put in
-static STASH: RwLock<Option<Box<dyn Send + Sync + 'static>>> = RwLock::new(None);
+// static STASH: RwLock<Option<Vec<&Box<dyn Send + Sync + 'static>>>> = RwLock::new(None);
+
+static STASH: RwLock<Vec<Box<dyn Send + Sync + 'static>>> = RwLock::new(Vec::new());
+
+pub fn clear_stash() {
+    let mut vec = STASH.write().unwrap();
+    vec.clear();
+}
 
 pub struct Stash<T>(pub T);
 
@@ -26,8 +34,8 @@ where
     fn from(x: Stash<T>) -> Self {
         let value = x.0;
         let wasm = (&value).into();
-        // Place values into the global stash when converting into Wasm
-        *STASH.write().unwrap() = Some(Box::new(value));
+        let mut vec = STASH.write().unwrap();
+        vec.push(Box::new(value));
         wasm
     }
 }
