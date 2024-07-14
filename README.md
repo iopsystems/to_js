@@ -64,7 +64,7 @@ function toJs(instance, alwaysCopyData) {
   const ptr = view.getUint32(instance.exports.JS, true);
   const len = view.getUint32(instance.exports.JS + 4, true);
   const code = new TextDecoder().decode(view.buffer.slice(ptr, ptr + len));
-  return import("data:text/javascript," + code).then((module) =>
+  return import(encodeURI("data:text/javascript," + code)).then((module) =>
     module.default(instance, alwaysCopyData)
   );
 }
