@@ -84,14 +84,14 @@ export default function toJs(instance, alwaysCopyData) {
         return pair[0] === 0 && pair[1] === 1;
     }
 
-    function dynamic(x) {
-        const [ptr, typeInfo] = u32Pair(x);
+    function dynamic([value, typeInfo]) {
+        // const [ptr, typeInfo] = u32Pair(x);
         const [flags, isArray, arrayType, transform] = u8Octet(typeInfo);
         const isResult = flags & 1, isOption = flags & 2;
         const isPackedArray = transform < 7;
         const isIdentityTransform = transform === 9;
         const slice = alwaysCopyData && (isPackedArray || (isArray && isIdentityTransform));
-        let value = new DataView(instanceExports.memory.buffer).getFloat64(ptr);
+        // let value = new DataView(instanceExports.memory.buffer).getFloat64(ptr);
         const pair = u32Pair(value);
         if (isResult)`tryResult(pair);`;
         if (isOption && tryOption(pair)) return null;
