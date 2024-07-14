@@ -49,6 +49,7 @@ export default function toJs(instance, alwaysCopyData) {
         (x) => {},
         Boolean,
         (x) => textDecoder.decode(x),
+        dynamic
     ];
 
     function cString(ptr) {
@@ -83,13 +84,31 @@ export default function toJs(instance, alwaysCopyData) {
         return pair[0] === 0 && pair[1] === 1;
     }
 
+    function dynamic(x) {
+        const [ptr, typeInfo] = u32Pair(x);
+        const [flags, isArray, arrayType, transform] = u8Octet(typeInfo);
+        const isResult = flags & 1, isOption = flags & 2;
+        const isPackedArray = transform < 7;
+        const isIdentityTransform = transform === 9;
+        const slice = alwaysCopyData && (isPackedArray || (isArray && isIdentityTransform));
+        let value = new DataView(instanceExports.memory.buffer).getFloat64(ptr);
+        const pair = u32Pair(value);
+        if (isResult)`tryResult(pair);`;
+        if (isOption && tryOption(pair)) return null;
+        if (isArray) value = new arrayTypes[arrayType](instanceExports.memory.buffer, pair[0], pair[1]);
+        const outputTransform = outputTransforms[transform];
+        const ret = outputTransform(value);
+        return slice ? ret.slice() : ret;
+    }
+
     return Object.fromEntries(
         Object.keys(instanceExports)
             .filter((d) => d.endsWith("_info_"))
             .map((nameWithSuffix) => {
                 const name = nameWithSuffix.slice(0, -6);
-                const [isResult, isOption, isArray, arrayType, transform] =
-                    u8Octet(instanceExports[`${name}_info_`]());
+                const typeInfo = u8Octet(instanceExports[`${name}_info_`]());
+                const [flags, isArray, arrayType, transform] = typeInfo;
+                const isResult = flags & 1, isOption = flags & 2;
                 const numArgs = instanceExports[name].length;
                 const args = Array.from({ length: numArgs }, (_, i) => `x${i + 1}`);
                 const argsAsString = args.join(", ");
@@ -97,16 +116,16 @@ export default function toJs(instance, alwaysCopyData) {
                 const isPackedArray = transform < 7;
                 const isIdentityTransform = transform === 9;
                 const slice = alwaysCopyData && (isPackedArray || (isArray && isIdentityTransform));
-                const fn = new Function(`exports`, `tryResult`, `tryOption`, `outputTransform`, `u32Pair`, `
+                const fn = new Function(`instanceExports`, `tryResult`, `tryOption`, `outputTransform`, `u32Pair`, `
                 return function ${name}(${argsAsString}) {
                     if (arguments.length !== ${args.length}) {
                         throw new Error(\`${name}: expected ${args.length} argument${args.length === 1 ? '' : 's'}, got \${arguments.length}\`);
                     }
-                    let value = exports.${name}(${argsAsString});
+                    let value = instanceExports.${name}(${argsAsString});
                     ${needsPair ? `const pair = u32Pair(value);` : ``}
                     ${isResult ? `tryResult(pair);` : ``}
                     ${isOption ? `if (tryOption(pair)) return null;` : ``}
-                    ${isArray ? `value = new ${arrayTypes[arrayType].name}(exports.memory.buffer, pair[0], pair[1])` : ``}
+                    ${isArray ? `value = new ${arrayTypes[arrayType].name}(instanceExports.memory.buffer, pair[0], pair[1])` : ``}
                     const ret = outputTransform(value);
                     return ${slice ? `ret.slice()` : `ret`}
                 }`);

@@ -1,26 +1,42 @@
-use crate::niche::{HasNiche, Niche};
-use crate::typeinfo::{ArrayType, Transform};
+use crate::typeinfo::{ArrayType, Info, Transform, TypeInfo};
 use crate::Wasm;
 
 // From<...> for Wasm impl
 //
 
-pub type Dynamic = dyn Sized + Into<Wasm>;
+pub struct Dynamic<T>(pub T);
 
-// impl From<bool> for Wasm {
-//     fn from(x: bool) -> Self {
-//         Wasm(x as u8 as f64)
-//     }
-// }
+impl<T> Dynamic<T>
+where
+    T: Into<Wasm>,
+{
+    pub fn new(x: T) -> Self {
+        Dynamic(x)
+    }
+}
 
-// // HasNiche impl
-// //
+impl<T> From<Dynamic<T>> for Wasm
+where
+    T: Into<Wasm>,
+{
+    fn from(x: Dynamic<T>) -> Self {
+        x.0.into()
+    }
+}
 
-// impl HasNiche for bool {
-//     const N: Niche = Niche::HighBitsNaN;
-// }
+// HasNiche impl
+//
 
-// // TypeInfo impl
-// //
+// TypeInfo impl
+//
 
-// impl_typeinfo!([bool, ArrayType::None, false, Transform::Bool]);
+impl<T> TypeInfo for Dynamic<T>
+where
+    T: Into<Wasm>,
+{
+    fn type_info() -> Info {
+        Info::new(ArrayType::None, false, Transform::Dynamic)
+    }
+}
+
+// what happens if you want to put a Stash<Vec<T>> into a Dynamic array? what gets stashed? or how do you put a vec into a dynamic otherwise?

@@ -37,6 +37,7 @@ pub enum Transform {
     Void,
     Bool,
     String,
+    Dynamic,
 }
 
 pub struct Info {
@@ -94,12 +95,13 @@ impl Info {
     }
 
     pub fn to_octet(self) -> [u8; 8] {
+        let flags: u8 = (self.is_result as u8) | ((self.is_option as u8) << 1);
         [
-            self.is_result as u8,
-            self.is_option as u8,
+            flags,
             self.is_array as u8,
             self.array_type as u8,
             self.transform as u8,
+            0,
             0,
             0,
             0,
