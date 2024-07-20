@@ -1,3 +1,4 @@
+use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform, TypeInfo};
 use crate::{Stash, Wasm};
 
@@ -25,6 +26,10 @@ impl From<Dynamic> for Wasm {
     fn from(x: Dynamic) -> Self {
         Stash(vec![x.value.value(), x.info.value()]).into()
     }
+}
+
+impl HasNiche for Dynamic {
+    const N: Niche = Niche::LowBitsOne;
 }
 
 impl_typeinfo!([Dynamic, ArrayType::F64, true, Transform::Dynamic]);
