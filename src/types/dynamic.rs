@@ -13,7 +13,7 @@ pub struct Dynamic {
 impl Dynamic {
     pub fn new<T>(x: T) -> Self
     where
-        Stash<T>: TypeInfo + Into<Wasm>,
+        Stash<T>: Into<Wasm> + TypeInfo,
     {
         Self {
             value: Stash(x).into(),
@@ -22,14 +22,23 @@ impl Dynamic {
     }
 }
 
+// From<...> for Wasm impl
+//
+
 impl From<Dynamic> for Wasm {
     fn from(x: Dynamic) -> Self {
         Stash(vec![x.value.value(), x.info.value()]).into()
     }
 }
 
+// HasNiche impl
+//
+
 impl HasNiche for Dynamic {
     const N: Niche = Niche::LowBitsOne;
 }
+
+// TypeInfo impl
+//
 
 impl_typeinfo!([Dynamic, ArrayType::F64, true, Transform::Dynamic]);
