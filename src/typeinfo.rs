@@ -40,6 +40,7 @@ pub enum Transform {
     Bool,
     String,
     Dynamic,
+    DynamicArray,
 }
 
 pub struct Info {

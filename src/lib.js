@@ -49,7 +49,15 @@ export default function toJs(instance, alwaysCopyData) {
         (x) => {},
         Boolean,
         (x) => textDecoder.decode(x),
-        dynamic
+        dynamic,
+        // DynamicArray
+        (x) => {
+            const ret = [];
+            for (let i = 0; i < x.length; i += 2) {
+                ret.push(dynamic(x.slice(i, i + 2)));
+            }
+            return ret;
+        }
     ];
 
     function cString(ptr) {

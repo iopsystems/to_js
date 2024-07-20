@@ -11,6 +11,7 @@ mod types;
 
 pub use typeinfo::TypeInfo;
 pub use types::dynamic::Dynamic;
+use types::number::Number;
 pub use types::packed::*;
 pub use types::stash::{clear_stash, Stash};
 
@@ -23,10 +24,14 @@ impl Wasm {
     }
 }
 
-impl<T> From<&T> for Wasm
+// Types that implement Into<Wasm> for which &T should implement Into<Wasm>
+trait RefIntoWasm {}
+// impl<T: Number> RefIntoWasm for T {}
+impl<T: Copy + Into<Wasm>> RefIntoWasm for T {}
+
+impl<T: RefIntoWasm> From<&T> for Wasm
 where
-    T: Copy,
-    T: Into<Wasm>,
+    T: Copy + Into<Wasm>,
 {
     fn from(x: &T) -> Self {
         T::into(*x)

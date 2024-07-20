@@ -2,7 +2,7 @@ use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform};
 use crate::Wasm;
 
-pub(crate) trait Number: 'static + Send + Sync {
+pub(crate) trait Number: 'static + Send + Sync + Copy {
     fn to_f64(self) -> f64;
 }
 

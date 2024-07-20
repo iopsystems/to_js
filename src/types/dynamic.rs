@@ -31,6 +31,19 @@ impl From<Dynamic> for Wasm {
     }
 }
 
+impl From<Box<[Dynamic]>> for Wasm {
+    fn from(x: Box<[Dynamic]>) -> Self {
+        Stash(
+            x.into_vec()
+                .into_iter()
+                .flat_map(|x| [x.value.value(), x.info.value()])
+                .collect::<Vec<_>>()
+                .into_boxed_slice(),
+        )
+        .into()
+    }
+}
+
 // HasNiche impl
 //
 
@@ -38,7 +51,14 @@ impl HasNiche for Dynamic {
     const N: Niche = Niche::LowBitsOne;
 }
 
+// impl HasNiche for Vec<Dynamic> {
+//     const N: Niche = Niche::LowBitsOne;
+// }
+
 // TypeInfo impl
 //
 
-impl_typeinfo!([Dynamic, ArrayType::F64, true, Transform::Dynamic]);
+impl_typeinfo! {
+    [Dynamic, ArrayType::F64, true, Transform::Dynamic],
+    [Box<[Dynamic]>, ArrayType::F64, true, Transform::DynamicArray],
+}
