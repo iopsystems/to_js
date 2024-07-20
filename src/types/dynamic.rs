@@ -9,6 +9,22 @@ use crate::typeinfo::{ArrayType, Transform, TypeInfo};
 // since that trait is not object-safe, since its method does not have a self parameter...
 use crate::{Stash, Wasm};
 
+pub struct IntoDynamic<T> {
+    pub value: T,
+}
+
+impl<T> IntoDynamic<T> {
+    pub fn new(value: T) -> Self {
+        Self { value }
+    }
+}
+
+impl<T: TypeInfo + Into<Wasm>> From<IntoDynamic<T>> for Dynamic {
+    fn from(x: IntoDynamic<T>) -> Self {
+        Dynamic::new(x.value)
+    }
+}
+
 pub struct Dynamic {
     value: Wasm,
     info: Wasm,
@@ -17,12 +33,10 @@ pub struct Dynamic {
 impl Dynamic {
     pub fn new<T>(x: T) -> Self
     where
-        // Wasm: for<'a> From<&'a T>,
-        Wasm: From<T>,
-        T: TypeInfo,
+        T: TypeInfo + Into<Wasm>,
     {
         Self {
-            value: x.into(),
+            value: x.into(), // box of impl intowasm?
             info: T::type_info().into(),
         }
     }
