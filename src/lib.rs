@@ -10,7 +10,7 @@ mod niche;
 mod types;
 
 pub use typeinfo::TypeInfo;
-pub use types::dynamic::{Dynamic, IntoDynamic};
+pub use types::dynamic::Dynamic;
 pub use types::packed::*;
 pub use types::stash::{clear_stash, Stash};
 
@@ -20,6 +20,16 @@ pub struct Wasm(f64);
 impl Wasm {
     pub fn value(self) -> f64 {
         self.0
+    }
+}
+
+impl<T> From<&T> for Wasm
+where
+    T: Copy,
+    T: Into<Wasm>,
+{
+    fn from(x: &T) -> Self {
+        T::into(*x)
     }
 }
 

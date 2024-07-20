@@ -15,6 +15,12 @@ macro_rules! impl_number {
                 }
             }
 
+            impl From<$type> for Wasm {
+                fn from(x: $type) -> Self {
+                    Wasm(x.to_f64())
+                }
+            }
+
             impl HasNiche for $type {
                 const N: Niche = Niche::HighBitsNaN;
             }
@@ -30,20 +36,27 @@ impl Number for u64 {
     }
 }
 
+impl From<u64> for Wasm {
+    fn from(x: u64) -> Self {
+        Wasm(x.to_f64())
+    }
+}
+
 impl Number for i64 {
     fn to_f64(self) -> f64 {
         (self as u64).to_f64()
     }
 }
 
-// From<...> for Wasm impl
-//
-
-impl<T: Number> From<T> for Wasm {
-    fn from(x: T) -> Self {
+impl From<i64> for Wasm {
+    fn from(x: i64) -> Self {
         Wasm(x.to_f64())
     }
 }
+
+// From<...> for Wasm impl
+// (implemented per-type in the macro above rather than with a blanket impl
+//  so as not to conflict with the blanket impl for &T where T: Into<Wasm> in lib.rs)
 
 // HasNiche impl
 // (There's no blanket implementation for Number since since not *all* numbers

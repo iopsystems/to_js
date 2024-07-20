@@ -129,6 +129,12 @@ macro_rules! impl_typeinfo {
                     $crate::typeinfo::Info::new($array_type, $is_array, $transform)
                 }
             }
+
+            impl $crate::typeinfo::TypeInfo for &$type {
+                fn type_info() -> $crate::typeinfo::Info {
+                    $crate::typeinfo::Info::new($array_type, $is_array, $transform)
+                }
+            }
         )*
     };
 }
