@@ -2,9 +2,6 @@ use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform, TypeInfo};
 use crate::{Stash, Wasm};
 
-// From<...> for Wasm impl
-//
-
 pub struct Dynamic {
     value: Wasm,
     info: Wasm,
@@ -22,17 +19,6 @@ impl Dynamic {
     }
 }
 
-// From<...> for Wasm impl
-//
-
-impl From<Dynamic> for Wasm {
-    fn from(x: Dynamic) -> Self {
-        // A single element is encoded in the same way as an array, but has different TypeInfo
-        // so that it can be returned as a single element rather than an Array on the JS side.
-        DynamicArray(vec![x]).into()
-    }
-}
-
 pub struct DynamicArray(Vec<Dynamic>);
 
 impl<T> From<T> for DynamicArray
@@ -41,6 +27,17 @@ where
 {
     fn from(x: T) -> Self {
         Self(x.into())
+    }
+}
+
+// From<...> for Wasm impl
+//
+
+impl From<Dynamic> for Wasm {
+    fn from(x: Dynamic) -> Self {
+        // A single element is encoded in the same way as an array, but has different TypeInfo
+        // so that it can be returned as a single element rather than an Array on the JS side.
+        DynamicArray(vec![x]).into()
     }
 }
 
