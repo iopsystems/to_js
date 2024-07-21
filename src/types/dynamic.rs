@@ -22,7 +22,16 @@ impl Dynamic {
     }
 }
 
-// This type exists to resolve ambiguities between the vec/slice/box<[T] impls
+impl<T> From<T> for Dynamic
+where
+    Stash<T>: Into<Wasm> + TypeInfo,
+{
+    fn from(x: T) -> Self {
+        Self::new(x)
+    }
+}
+
+// This type exists to resolve dispatch ambiguities between the vec/slice/box<[T] impls
 // and the specific implementation we want for a slice/vec of Dynamic values.
 pub struct DynamicArray(Vec<Dynamic>);
 
