@@ -56,7 +56,7 @@ impl From<i64> for Wasm {
 
 // From<...> for Wasm impl
 // (implemented per-type in the macro above rather than with a blanket impl
-//  so as not to conflict with the blanket impl for &T where T: Copy + Into<Wasm> in lib.rs)
+//  so as not to conflict with the blanket impl in lib.rs for From<&T> where T: Copy + Into<Wasm>)
 
 // HasNiche impl
 // (There's no blanket implementation for Number since since not *all* numbers
