@@ -9,7 +9,7 @@ pub struct Dynamic {
 
 impl Dynamic {
     /// Construct a new Dynamic value. All Dynamic construction goes through
-    /// this function, ensuring that the values are stashed before being
+    /// this function, ensuring that dynamic values are stashed before being
     /// returned across the WebAssembly FFI boundary.
     pub fn new<T>(x: T) -> Self
     where
