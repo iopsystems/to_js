@@ -100,17 +100,17 @@ export default function toJs(instance, alwaysCopyData) {
     }
 
     function dynamic([value, typeInfo]) {
-        const [flags, isArray, arrayType, transform] = u8Octet(typeInfo);
+        const [flags, isArray, arrayType, transformIndex] = u8Octet(typeInfo);
         const isResult = flags & 1, isOption = flags & 2;
-        const isPackedArray = transform < 7;
-        const isIdentityTransform = transform === 9;
+        const isPackedArray = transformIndex < 7;
+        const isIdentityTransform = transformIndex === 9;
         const slice = alwaysCopyData && (isPackedArray || (isArray && isIdentityTransform));
         const pair = u32Pair(value);
         if (isResult) tryResult(isArray)(pair);
         if (isOption && tryOption(isArray)(pair)) return null;
         if (isArray) value = new arrayTypes[arrayType](instanceExports.memory.buffer, pair[0], pair[1]);
-        const outputTransform = outputTransforms[transform];
-        const ret = outputTransform(value);
+        const transform = outputTransforms[transformIndex];
+        const ret = transform(value);
         return slice ? ret.slice() : ret;
     }
 
@@ -120,14 +120,14 @@ export default function toJs(instance, alwaysCopyData) {
             .map((nameWithSuffix) => {
                 const name = nameWithSuffix.slice(0, -6);
                 const typeInfo = u8Octet(instanceExports[`${name}_info_`]());
-                const [flags, isArray, arrayType, transform] = typeInfo;
+                const [flags, isArray, arrayType, transformIndex] = typeInfo;
                 const isResult = flags & 1, isOption = flags & 2;
                 const numArgs = instanceExports[name].length;
                 const args = Array.from({ length: numArgs }, (_, i) => `x${i + 1}`);
                 const argsAsString = args.join(", ");
                 const needsPair = isResult || isOption || isArray;
-                const isPackedArray = transform < 7;
-                const isIdentityTransform = transform === 9;
+                const isPackedArray = transformIndex < 7;
+                const isIdentityTransform = transformIndex === 9;
                 const slice = alwaysCopyData && (isPackedArray || (isArray && isIdentityTransform));
                 // Compile a specialized function for each export using basic dead-code elimination to elide
                 // unnecessary transformations (eg. only include Option-processing code if the return value is an Option).
@@ -150,7 +150,7 @@ return function ${name}(${argsAsString}) {
                         instanceExports,
                         tryResult(isArray),
                         tryOption(isArray),
-                        outputTransforms[transform],
+                        outputTransforms[transformIndex],
                         u32Pair
                     )
                 ];
