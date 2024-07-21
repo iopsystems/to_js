@@ -58,19 +58,7 @@ impl<T: TypeInfo> TypeInfo for Option<T> {
     }
 }
 
-impl<T: TypeInfo> TypeInfo for &Option<T> {
-    fn type_info() -> Info {
-        T::type_info().option()
-    }
-}
-
 impl<T: TypeInfo, E> TypeInfo for Result<T, E> {
-    fn type_info() -> Info {
-        T::type_info().result()
-    }
-}
-
-impl<T: TypeInfo, E> TypeInfo for &Result<T, E> {
     fn type_info() -> Info {
         T::type_info().result()
     }

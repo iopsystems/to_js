@@ -121,17 +121,20 @@ pub trait TypeInfo {
     fn type_info() -> Info;
 }
 
+// The type info for a reference is the same as the typeinfo for the value.
+// References are Wasm-ified assuming the memory they refer to will live at
+// least past the FFI boundary (after the Rust function returns).
+impl<T: TypeInfo> TypeInfo for &T {
+    fn type_info() -> Info {
+        <T as TypeInfo>::type_info()
+    }
+}
+
 #[macro_export]
 macro_rules! impl_typeinfo {
     ($( [$type:ty, $array_type:expr, $is_array:ident, $transform:expr] $(,)? )*) => {
         $(
             impl $crate::typeinfo::TypeInfo for $type {
-                fn type_info() -> $crate::typeinfo::Info {
-                    $crate::typeinfo::Info::new($array_type, $is_array, $transform)
-                }
-            }
-
-            impl $crate::typeinfo::TypeInfo for &$type {
                 fn type_info() -> $crate::typeinfo::Info {
                     $crate::typeinfo::Info::new($array_type, $is_array, $transform)
                 }
