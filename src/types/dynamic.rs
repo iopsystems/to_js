@@ -12,6 +12,9 @@ impl Dynamic {
     where
         Stash<T>: Into<Wasm> + TypeInfo,
     {
+        // We stash values at the point of Wasm conversion to prevent returning
+        // dangling pointers into Rust memory across the WebAssembly FFI boundary.
+        // All Dynamic construction goes through this function.
         Self {
             value: Stash(x).into(),
             info: <Stash<T>>::type_info().into(),
@@ -35,8 +38,8 @@ where
 
 impl From<Dynamic> for Wasm {
     fn from(x: Dynamic) -> Self {
-        // A single element is encoded in the same way as an array, but has different TypeInfo
-        // so that it can be returned as a single element rather than an Array on the JS side.
+        // A Dynamic is encoded like a DynamicArray, but has different TypeInfo so that
+        // it can be returned as a single element rather than an Array on the JS side.
         DynamicArray(vec![x]).into()
     }
 }
