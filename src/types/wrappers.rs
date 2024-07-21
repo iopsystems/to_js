@@ -1,7 +1,6 @@
 use crate::niche::HasNiche;
 use crate::typeinfo::{Info, TypeInfo};
 use crate::types::errorstring::ErrorString;
-use crate::IntoWasm;
 use crate::Wasm;
 
 // We allow Option and Result as wrapper types, and they
@@ -14,17 +13,17 @@ use crate::Wasm;
 // From<...> for Wasm impl
 //
 
-impl<T: HasNiche> IntoWasm for Option<T> {
-    fn into_wasm(&self) -> Wasm {
-        match self {
-            Some(x) => x.into_wasm(),
+impl<T: HasNiche> From<Option<T>> for Wasm {
+    fn from(x: Option<T>) -> Self {
+        match x {
+            Some(x) => x.into(),
             None => T::N.new(0),
         }
     }
 }
 
-impl<T: HasNiche, E: ErrorString> IntoWasm for Result<Option<T>, E> {
-    fn into_wasm(&self) -> Self {
+impl<T: HasNiche, E: ErrorString> From<Result<Option<T>, E>> for Wasm {
+    fn from(x: Result<Option<T>, E>) -> Self {
         x.transpose().into()
     }
 }

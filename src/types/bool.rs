@@ -1,14 +1,13 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform};
-use crate::IntoWasm;
 use crate::Wasm;
 
 // From<...> for Wasm impl
 //
 
-impl IntoWasm for bool {
-    fn into_wasm(&self) -> Wasm {
-        Wasm(*self as u8 as f64)
+impl From<bool> for Wasm {
+    fn from(x: bool) -> Self {
+        Wasm(x as u8 as f64)
     }
 }
 

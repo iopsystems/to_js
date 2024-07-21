@@ -30,39 +30,14 @@ impl Wasm {
 // Adding this blanket implementation allows us to use basic types (bool, numbers, strings) together
 // with the more advanced features this library provides (Stash and Dynamic), since stashing a value
 // requires that a reference to that value is Into<Wasm>.
-// impl<T> From<&T> for Wasm
-// where
-//     T: Copy + Into<Wasm>,
-// {
-//     fn from(x: &T) -> Self {
-//         T::into(*x)
-//     }
-// }
-
-trait IntoWasm {
-    fn into_wasm(&self) -> Wasm;
-}
-
-impl<T> IntoWasm for &T
+impl<T> From<&T> for Wasm
 where
-    T: IntoWasm,
+    T: Copy + Into<Wasm>,
 {
-    fn into_wasm(&self) -> Wasm {
-        (*self).into_wasm()
+    fn from(x: &T) -> Self {
+        T::into(*x)
     }
 }
-
-impl<T: IntoWasm> From<T> for Wasm {
-    fn from(x: T) -> Self {
-        x.into_wasm()
-    }
-}
-
-// impl<T: IntoWasm> for &T {
-//     fn from(x: &T) -> Self {
-//         x.into_wasm()
-//     }
-// }
 
 /// This macro is part of the API surface of this package. The other part is the #[js] proc macro, which calls this one.
 /// You can wrap a series of function definitions in this macro in order to export them to JavaScript via WebAssembly.
