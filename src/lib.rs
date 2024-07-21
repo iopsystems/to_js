@@ -14,7 +14,8 @@ pub use types::dynamic::{Dynamic, DynamicArray};
 pub use types::packed::*;
 pub use types::stash::{clear_stash, Stash};
 
-// Core struct that represents values that can be returned across the FFI boundary
+// Wasm is the central type of this library and represents values that can be returned across the FFI boundary.
+// Individual types that we want to be serializable implement Into<Wasm> via impls of the `From` trait.
 pub struct Wasm(f64);
 
 impl Wasm {
@@ -23,10 +24,12 @@ impl Wasm {
     }
 }
 
-// We implement Into<Wasm> for references to any type that is copiable and Into<Wasm>
-// in order to allow basic data types like bools and Numbers to be placed into the Stash
-// (which in turn enables their use in Dynamic values).
-// There's a corresponding implementation of the TypeInfo trait for references in typeinfo.rs.
+// For types that can be efficiently dereferenced, we allow their references to be serialized.
+// The workings of this library mean that functions are only converted into `Wasm`s when we are
+// confident that they will outlive the Rust side of the FFI call and be available on the JS side.
+// Adding this blanket implementation allows us to use basic types (bool, numbers, strings) together
+// with the more advanced features this library provides (Stash and Dynamic), since stashing a value
+// requires that a reference to that value is Into<Wasm>.
 impl<T> From<&T> for Wasm
 where
     T: Copy + Into<Wasm>,
@@ -38,7 +41,8 @@ where
 
 /// This macro is part of the API surface of this package. The other part is the #[js] proc macro, which calls this one.
 /// You can wrap a series of function definitions in this macro in order to export them to JavaScript via WebAssembly.
-/// Note: Unlike the #[js] proc macro, to_js! requires that all functions have an explicit return type, even if it is ().
+/// Note: Unlike the #[js] proc macro, to_js! requires that all functions have an explicit return type, even if it is (),
+/// since we use that macro capture ($ret) to figure out the TypeInfo for each function the user wants to export.
 #[macro_export]
 macro_rules! to_js {
     ($( $(#[$meta:meta])* $vis:vis fn $name:ident($($arg:ident : $typ:ty),*) -> $ret:ty $body:block )*) => {
