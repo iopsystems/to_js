@@ -4,7 +4,7 @@ use crate::{Stash, Wasm};
 
 pub struct Dynamic {
     value: Wasm,
-    info: Wasm,
+    type_info: Wasm,
 }
 
 impl Dynamic {
@@ -17,7 +17,7 @@ impl Dynamic {
     {
         Self {
             value: Stash(x).into(),
-            info: <Stash<T>>::type_info().into(),
+            type_info: <Stash<T>>::type_info().into(),
         }
     }
 }
@@ -59,7 +59,7 @@ impl From<DynamicArray> for Wasm {
     fn from(x: DynamicArray) -> Self {
         Stash(
             x.0.into_iter()
-                .flat_map(|x| [x.value.value(), x.info.value()])
+                .flat_map(|x| [x.value.value(), x.type_info.value()])
                 .collect::<Vec<_>>()
                 .into_boxed_slice(),
         )
