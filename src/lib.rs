@@ -25,7 +25,8 @@ impl Wasm {
 
 // We implement Into<Wasm> for references to any type that is copiable and Into<Wasm>
 // in order to allow basic data types like bools and Numbers to be placed into the Stash
-// (which in turn enables their use in Dynamic values)
+// (which in turn enables their use in Dynamic values).
+// There's a corresponding implementation of the TypeInfo trait for references in typeinfo.rs.
 impl<T> From<&T> for Wasm
 where
     T: Copy + Into<Wasm>,
