@@ -129,6 +129,8 @@ export default function toJs(instance, alwaysCopyData) {
                 const isPackedArray = transform < 7;
                 const isIdentityTransform = transform === 9;
                 const slice = alwaysCopyData && (isPackedArray || (isArray && isIdentityTransform));
+                // Compile a specialized function for each export using basic dead-code elimination to elide
+                // unnecessary transformations (eg. only include Option-processing code if the return value is an Option).
                 const fn = new Function(`instanceExports`, `tryResult`, `tryOption`, `outputTransform`, `u32Pair`, `
                 return function ${name}(${argsAsString}) {
                     if (arguments.length !== ${args.length}) {
