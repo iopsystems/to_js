@@ -91,7 +91,7 @@ pub unsafe fn deallocate<T>(ptr: *mut T) {
 /// exporting this constant directly. Its value is a two-element slice descriptor whose first element is a pointer
 /// to the string contents and whose second element is the string's length.
 /// Note: We currently embed unminified JavaScript. With basic zip compression, the difference in .wasm.zip size
-/// is a little over half a kilobyte between the unminified a minified version using esbuild:
+/// is a little over half a kilobyte between the unminified code and a version minified using esbuild:
 /// https://esbuild.github.io/try/#dAAwLjIzLjAALS1taW5pZnkA.
 #[used]
 #[export_name = "JS"]
