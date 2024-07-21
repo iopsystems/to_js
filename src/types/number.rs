@@ -56,12 +56,11 @@ impl From<i64> for Wasm {
 
 // From<...> for Wasm impl
 // (implemented per-type in the macro above rather than with a blanket impl
-//  so as not to conflict with the blanket impl for &T where T: Into<Wasm> in lib.rs)
+//  so as not to conflict with the blanket impl for &T where T: Copy + Into<Wasm> in lib.rs)
 
 // HasNiche impl
 // (There's no blanket implementation for Number since since not *all* numbers
-//  are niche; u64 and i64 have no available niche. We implemented it for
-//  all supported primitives using the impl_number! macro.)
+//  have niches; in particular, u64 and i64 have no niches available.)
 
 // TypeInfo impl
 //

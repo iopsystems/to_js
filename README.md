@@ -1,6 +1,6 @@
 # To JS
 
-A small package for simple WebAssembly-to-JavaScript exports for numbers, typed arrays, and strings. Supports returning `Option` and `Result` values, which can return `null` and throw an error, respectively. Typed arrays can be returned as views of Rust memory, avoiding data copies.
+A small package for simple WebAssembly-to-JavaScript exports for numbers, typed arrays, and strings. Supports returning `Option`s (as `null`) and `Result`s (throwing an exception). Typed arrays can be returned as views of Rust memory, avoiding data copies.
 
 ## Examples
 
@@ -28,7 +28,7 @@ fn slice() -> &'static [u32] {
 }
 ```
 
-Returning owned values is accomplished by wrapping them in a `Stash`, which ensures the value lives at least until the next call to a Rust function.
+Returning owned values is accomplished by wrapping them in a `Stash`, which ensures the value lives until the next FFI call from JS to a Rust function.
 
 ```rust
 use to_js::Stash;
@@ -56,9 +56,9 @@ fn vec_result(count_up_to: usize) -> Result<Stash<Vec<usize>>, &'static str> {
 
 ```js
 // Given a WebAssembly instance, return an object containing its #[js] exports.
-// If the optional second argument is true, typed arrays will be copied out of
-// WebAssembly memory before being returned, enhancing ease-of-use at the cost
-// of extra data copies.
+// If the optional second argument is true, typed arrays (including ones that
+// were stashed) will be copied out of WebAssembly memory before being returned,
+// enhancing ease-of-use at the cost of extra data copies.
 function toJs(instance, alwaysCopyData) {
   const view = new DataView(instance.exports.memory.buffer);
   const ptr = view.getUint32(instance.exports.JS, true);

@@ -4,11 +4,8 @@ use std::ffi::{CStr, CString};
 
 // Error strings are a special internal type used to limit the Result Err variant
 // to be a C-style null-terminated string so that it can be encoded in 32 bits.
-
-// Stash safety:
-// We rely on the Stash for CStrings to ensure that value lives long enough for data to be copied out.
-// This does not conflict with any user uses of Stash because we only evaluate this function if we are
-// in the error variant of a Result return value.
+// We rely on the Stash for CStrings to ensure that value lives long enough for
+// data to be copied out on the JavaScript side.
 
 pub(crate) trait ErrorString {
     fn to_u32(self) -> u32;
