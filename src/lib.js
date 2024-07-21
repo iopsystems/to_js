@@ -132,18 +132,18 @@ export default function toJs(instance, alwaysCopyData) {
                 // Compile a specialized function for each export using basic dead-code elimination to elide
                 // unnecessary transformations (eg. only include Option-processing code if the return value is an Option).
                 const fn = new Function(`exports`, `tryResult`, `tryOption`, `transform`, `u32Pair`, `
-                return function ${name}(${argsAsString}) {
-                    if (arguments.length !== ${args.length}) {
-                        throw new Error(\`${name}: expected ${args.length} argument${args.length === 1 ? '' : 's'}, got \${arguments.length}\`);
-                    }
-                    let value = exports.${name}(${argsAsString});
-                    ${needsPair ? `const pair = u32Pair(value);` : ``}
-                    ${isResult ? `tryResult(pair);` : ``}
-                    ${isOption ? `if (tryOption(pair)) return null;` : ``}
-                    ${isArray ? `value = new ${arrayTypes[arrayType].name}(exports.memory.buffer, pair[0], pair[1])` : ``}
-                    const ret = transform(value);
-                    return ${slice ? `ret.slice()` : `ret`}
-                }`);
+return function ${name}(${argsAsString}) {
+    if (arguments.length !== ${args.length}) {
+        throw new Error(\`${name}: expected ${args.length} argument${args.length === 1 ? '' : 's'}, got \${arguments.length}\`);
+    }
+    let value = exports.${name}(${argsAsString});
+    ${needsPair ? `const pair = u32Pair(value);` : ``}
+    ${isResult ? `tryResult(pair);` : ``}
+    ${isOption ? `if (tryOption(pair)) return null;` : ``}
+    ${isArray ? `value = new ${arrayTypes[arrayType].name}(exports.memory.buffer, pair[0], pair[1])` : ``}
+    const ret = transform(value);
+    return ${slice ? `ret.slice()` : `ret`}
+}`);
                 return [
                     name,
                     fn(
