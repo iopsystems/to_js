@@ -12,13 +12,6 @@ impl<T: Number> From<&Vec<T>> for Wasm {
     }
 }
 
-// This would enable auto-stashing but conflicts with the blanket From<X: Copy> impl in lib.rs
-// impl<T: Number> From<Vec<T>> for Wasm {
-//     fn from(x: Vec<T>) -> Self {
-//         Stash(x).into()
-//     }
-// }
-
 // HasNiche impl
 //
 
