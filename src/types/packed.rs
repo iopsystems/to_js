@@ -6,14 +6,25 @@ use crate::Wasm;
 // preallocated arrays on the JavaScript side that
 // reinterpret the memory of a single-element Float64Array.
 
+#[derive(Copy, Clone)]
 pub struct U8Octet(pub [u8; 8]);
+
+#[derive(Copy, Clone)]
 pub struct I8Octet(pub [i8; 8]);
 
+#[derive(Copy, Clone)]
 pub struct U16Quartet(pub [u16; 4]);
+
+#[derive(Copy, Clone)]
 pub struct I16Quartet(pub [i16; 4]);
 
+#[derive(Copy, Clone)]
 pub struct U32Pair(pub [u32; 2]);
+
+#[derive(Copy, Clone)]
 pub struct I32Pair(pub [i32; 2]);
+
+#[derive(Copy, Clone)]
 pub struct F32Pair(pub [f32; 2]);
 
 // From<...> for Wasm impl
