@@ -47,7 +47,7 @@ impl<T: HasNiche, E: ErrorString> From<Option<Result<T, E>>> for Wasm {
 }
 
 // HasNiche impl
-// (none since these types are the wrappers; they cannot themselves be wrapped)
+// (no impls since these types are the wrappers; they cannot themselves be wrapped)
 
 // TypeInfo impl
 //
@@ -58,7 +58,19 @@ impl<T: TypeInfo> TypeInfo for Option<T> {
     }
 }
 
+impl<T: TypeInfo> TypeInfo for &Option<T> {
+    fn type_info() -> Info {
+        T::type_info().option()
+    }
+}
+
 impl<T: TypeInfo, E> TypeInfo for Result<T, E> {
+    fn type_info() -> Info {
+        T::type_info().result()
+    }
+}
+
+impl<T: TypeInfo, E> TypeInfo for &Result<T, E> {
     fn type_info() -> Info {
         T::type_info().result()
     }

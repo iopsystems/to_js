@@ -27,15 +27,24 @@ impl Dynamic {
 
 impl From<Dynamic> for Wasm {
     fn from(x: Dynamic) -> Self {
-        Stash(vec![x.value.value(), x.info.value()]).into()
+        // A single element is encoded the same as an array, but has different TypeInfo so that
+        // it's returned as a single element on the JS side rather than a one-element array.
+        DynamicArray(vec![x]).into()
     }
 }
 
-impl From<Box<[Dynamic]>> for Wasm {
-    fn from(x: Box<[Dynamic]>) -> Self {
+pub struct DynamicArray(Vec<Dynamic>);
+
+impl From<Vec<Dynamic>> for DynamicArray {
+    fn from(x: Vec<Dynamic>) -> Self {
+        Self(x)
+    }
+}
+
+impl From<DynamicArray> for Wasm {
+    fn from(x: DynamicArray) -> Self {
         Stash(
-            x.into_vec()
-                .into_iter()
+            x.0.into_iter()
                 .flat_map(|x| [x.value.value(), x.info.value()])
                 .collect::<Vec<_>>()
                 .into_boxed_slice(),
@@ -51,6 +60,10 @@ impl HasNiche for Dynamic {
     const N: Niche = Niche::LowBitsOne;
 }
 
+impl HasNiche for DynamicArray {
+    const N: Niche = Niche::LowBitsOne;
+}
+
 // impl HasNiche for Vec<Dynamic> {
 //     const N: Niche = Niche::LowBitsOne;
 // }
@@ -60,5 +73,5 @@ impl HasNiche for Dynamic {
 
 impl_typeinfo! {
     [Dynamic, ArrayType::F64, true, Transform::Dynamic],
-    [Box<[Dynamic]>, ArrayType::F64, true, Transform::DynamicArray],
+    [DynamicArray, ArrayType::F64, true, Transform::DynamicArray],
 }

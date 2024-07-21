@@ -1,6 +1,6 @@
+use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{Info, TypeInfo};
 use crate::types::number::Number;
-use crate::niche::{Niche, HasNiche};
 use crate::Wasm;
 
 // From<...> for Wasm impl

@@ -50,7 +50,6 @@ export default function toJs(instance, alwaysCopyData) {
         Boolean,
         (x) => textDecoder.decode(x),
         dynamic,
-        // DynamicArray
         (x) => {
             const ret = [];
             for (let i = 0; i < x.length; i += 2) {
@@ -89,7 +88,15 @@ export default function toJs(instance, alwaysCopyData) {
     }
 
     function tryOptionLowBitsOne(pair) {
-        return pair[0] === 0 && pair[1] === 1;
+        return pair[0] === 1 && pair[1] === 0;
+    }
+
+    function tryOption(isArray) {
+        return isArray ? tryOptionLowBitsOne : tryOptionHighBitsNaN;
+    }
+
+    function tryResult(isArray) {
+        return isArray ? tryResultLowBitsOne : tryResultHighBitsNaN;
     }
 
     function dynamic([value, typeInfo]) {
@@ -99,8 +106,8 @@ export default function toJs(instance, alwaysCopyData) {
         const isIdentityTransform = transform === 9;
         const slice = alwaysCopyData && (isPackedArray || (isArray && isIdentityTransform));
         const pair = u32Pair(value);
-        if (isResult) tryResult(pair);
-        if (isOption && tryOption(pair)) return null;
+        if (isResult) tryResult(isArray)(pair);
+        if (isOption && tryOption(isArray)(pair)) return null;
         if (isArray) value = new arrayTypes[arrayType](instanceExports.memory.buffer, pair[0], pair[1]);
         const outputTransform = outputTransforms[transform];
         const ret = outputTransform(value);
@@ -139,8 +146,8 @@ export default function toJs(instance, alwaysCopyData) {
                     name,
                     fn(
                         instanceExports,
-                        isResult && (isArray ? tryResultLowBitsOne : tryResultHighBitsNaN),
-                        isOption && (isArray ? tryOptionLowBitsOne : tryOptionHighBitsNaN),
+                        tryResult(isArray),
+                        tryOption(isArray),
                         outputTransforms[transform],
                         u32Pair
                     )
