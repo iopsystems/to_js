@@ -8,13 +8,13 @@ pub struct Dynamic {
 }
 
 impl Dynamic {
+    // We stash values at the point of Wasm conversion to prevent returning
+    // dangling pointers into Rust memory across the WebAssembly FFI boundary.
+    // All Dynamic construction goes through this function.
     pub fn new<T>(x: T) -> Self
     where
         Stash<T>: Into<Wasm> + TypeInfo,
     {
-        // We stash values at the point of Wasm conversion to prevent returning
-        // dangling pointers into Rust memory across the WebAssembly FFI boundary.
-        // All Dynamic construction goes through this function.
         Self {
             value: Stash(x).into(),
             info: <Stash<T>>::type_info().into(),
