@@ -27,17 +27,20 @@ impl Dynamic {
 
 impl From<Dynamic> for Wasm {
     fn from(x: Dynamic) -> Self {
-        // A single element is encoded the same as an array, but has different TypeInfo so that
-        // it's returned as a single element on the JS side rather than a one-element array.
+        // A single element is encoded in the same way as an array, but has different TypeInfo
+        // so that it can be returned as a single element rather than an Array on the JS side.
         DynamicArray(vec![x]).into()
     }
 }
 
 pub struct DynamicArray(Vec<Dynamic>);
 
-impl From<Vec<Dynamic>> for DynamicArray {
-    fn from(x: Vec<Dynamic>) -> Self {
-        Self(x)
+impl<T> From<T> for DynamicArray
+where
+    T: Into<Vec<Dynamic>>,
+{
+    fn from(x: T) -> Self {
+        Self(x.into())
     }
 }
 
@@ -64,14 +67,10 @@ impl HasNiche for DynamicArray {
     const N: Niche = Niche::LowBitsOne;
 }
 
-// impl HasNiche for Vec<Dynamic> {
-//     const N: Niche = Niche::LowBitsOne;
-// }
-
 // TypeInfo impl
 //
 
 impl_typeinfo! {
-    [Dynamic, ArrayType::F64, true, Transform::Dynamic],
+    [Dynamic,      ArrayType::F64, true, Transform::Dynamic],
     [DynamicArray, ArrayType::F64, true, Transform::DynamicArray],
 }
