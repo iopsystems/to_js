@@ -1,4 +1,5 @@
 use crate::types::packed::U32Pair;
+use crate::IntoWasm;
 use crate::Wasm;
 
 /// Encoding strategies for marking Option<T> and Result<T> variants using a set of niche values,
@@ -26,6 +27,6 @@ impl Niche {
     }
 }
 
-pub(crate) trait HasNiche: Into<Wasm> {
+pub(crate) trait HasNiche: IntoWasm {
     const N: Niche;
 }

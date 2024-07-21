@@ -1,14 +1,15 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform};
+use crate::IntoWasm;
 use crate::Wasm;
 use std::ffi::{CStr, CString};
 
 // From<...> for Wasm impl
 //
 
-impl From<&String> for Wasm {
-    fn from(x: &String) -> Self {
-        x.as_bytes().into()
+impl IntoWasm for String {
+    fn into_wasm(&self) -> Wasm {
+        self.as_bytes().into()
     }
 }
 

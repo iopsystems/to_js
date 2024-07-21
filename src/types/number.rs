@@ -1,5 +1,6 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform};
+use crate::IntoWasm;
 use crate::Wasm;
 
 pub(crate) trait Number: 'static + Send + Sync + Copy {
@@ -15,9 +16,9 @@ macro_rules! impl_number {
                 }
             }
 
-            impl From<$type> for Wasm {
-                fn from(x: $type) -> Self {
-                    Wasm(x.to_f64())
+            impl IntoWasm for $type {
+                fn into_wasm(&self) -> Wasm {
+                     Wasm(self.to_f64())
                 }
             }
 
