@@ -56,7 +56,7 @@ where
 impl<T> HasNiche for Stash<T>
 where
     for<'a> &'a T: HasNiche,
-    Stash<T>: Into<Wasm>,
+    Stash<T>: IntoWasm,
 {
     const N: Niche = <&T>::N;
 }

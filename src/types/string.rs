@@ -1,5 +1,6 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform};
+use crate::ToWasm;
 use crate::Wasm;
 use std::ffi::{CStr, CString};
 
@@ -30,6 +31,27 @@ impl From<&CString> for Wasm {
     }
 }
 
+impl ToWasm for &String {
+    fn to_wasm(&self) -> Wasm {
+        (*self).into()
+    }
+}
+
+impl ToWasm for &str {
+    fn to_wasm(&self) -> Wasm {
+        (*self).into()
+    }
+}
+impl ToWasm for &CStr {
+    fn to_wasm(&self) -> Wasm {
+        (*self).into()
+    }
+}
+impl ToWasm for &CString {
+    fn to_wasm(&self) -> Wasm {
+        (*self).into()
+    }
+}
 // HasNiche impl
 //
 

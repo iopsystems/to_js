@@ -1,5 +1,6 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform};
+use crate::ToWasm;
 use crate::Wasm;
 
 pub(crate) trait Number: 'static + Send + Sync + Copy {
@@ -20,6 +21,13 @@ macro_rules! impl_number {
                     Wasm(x.to_f64())
                 }
             }
+
+            impl ToWasm for $type {
+                fn to_wasm(&self) -> Wasm {
+                    Wasm(self.to_f64())
+                }
+            }
+
 
             impl HasNiche for $type {
                 const N: Niche = Niche::HighBitsNaN;
@@ -42,6 +50,12 @@ impl From<u64> for Wasm {
     }
 }
 
+impl ToWasm for u64 {
+    fn to_wasm(&self) -> Wasm {
+        Wasm(self.to_f64())
+    }
+}
+
 impl Number for i64 {
     fn to_f64(self) -> f64 {
         (self as u64).to_f64()
@@ -51,6 +65,12 @@ impl Number for i64 {
 impl From<i64> for Wasm {
     fn from(x: i64) -> Self {
         Wasm(x.to_f64())
+    }
+}
+
+impl ToWasm for i64 {
+    fn to_wasm(&self) -> Wasm {
+        Wasm(self.to_f64())
     }
 }
 

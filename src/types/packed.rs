@@ -1,4 +1,5 @@
 use crate::typeinfo::{ArrayType, Transform};
+use crate::ToWasm;
 use crate::Wasm;
 
 // Packed arrays (encoded into 64 bits).
@@ -83,6 +84,48 @@ impl From<I32Pair> for Wasm {
 impl From<F32Pair> for Wasm {
     fn from(x: F32Pair) -> Self {
         U32Pair(x.0.map(f32::to_bits)).into()
+    }
+}
+
+impl ToWasm for U8Octet {
+    fn to_wasm(&self) -> Wasm {
+        (*self).into()
+    }
+}
+
+impl ToWasm for I8Octet {
+    fn to_wasm(&self) -> Wasm {
+        (*self).into()
+    }
+}
+
+impl ToWasm for U16Quartet {
+    fn to_wasm(&self) -> Wasm {
+        (*self).into()
+    }
+}
+
+impl ToWasm for I16Quartet {
+    fn to_wasm(&self) -> Wasm {
+        (*self).into()
+    }
+}
+
+impl ToWasm for U32Pair {
+    fn to_wasm(&self) -> Wasm {
+        (*self).into()
+    }
+}
+
+impl ToWasm for I32Pair {
+    fn to_wasm(&self) -> Wasm {
+        (*self).into()
+    }
+}
+
+impl ToWasm for F32Pair {
+    fn to_wasm(&self) -> Wasm {
+        (*self).into()
     }
 }
 

@@ -30,21 +30,21 @@ impl Wasm {
 // Adding this blanket implementation allows us to use basic types (bool, numbers, strings) together
 // with the more advanced features this library provides (Stash and Dynamic), since stashing a value
 // requires that a reference to that value is Into<Wasm>.
-impl<T> From<&T> for Wasm
-where
-    T: Copy + Into<Wasm>,
-{
-    fn from(x: &T) -> Self {
-        T::into(*x)
-    }
-}
+// impl<T> From<&T> for Wasm
+// where
+//     T: Copy + Into<Wasm>,
+// {
+//     fn from(x: &T) -> Self {
+//         T::into(*x)
+//     }
+// }
 
 trait ToWasm {
     fn to_wasm(&self) -> Wasm;
 }
 
 // The Wasmification process will call into_wasm.
-trait IntoWasm {
+pub trait IntoWasm {
     fn into_wasm(self) -> Wasm;
 }
 
@@ -54,9 +54,18 @@ impl<T: ToWasm> IntoWasm for T {
     }
 }
 
+// impl<T> IntoWasm for &T
+// where
+//     for<'a> &'a T: IntoWasm,
+// {
+//     fn into_wasm(self) -> Wasm {
+//         self.into_wasm()
+//     }
+// }
+
 impl<T> ToWasm for &T
 where
-    T: Copy + ToWasm,
+    T: ToWasm,
 {
     fn to_wasm(&self) -> Wasm {
         ToWasm::to_wasm(*self)
@@ -78,21 +87,21 @@ macro_rules! to_js {
             // Define exported functions, using a const block in order to allow repetition of the Rust-side
             // function names (call and info) if multiple functions are exported in the same outer scope.
             const _: () = {
-                use $crate::{Wasm, TypeInfo, U8Octet};
+                use $crate::{IntoWasm, Wasm, TypeInfo, U8Octet};
 
                 // Define the exported function, which returns an f64-encoded Wasm value
                 #[export_name = concat!(stringify!($name))]
                 pub extern "C" fn call($($arg: $typ),*) -> f64 {
                     $crate::clear_stash();
                     let value = $name($($arg),*);
-                    Wasm::from(value).value()
+                    IntoWasm::into_wasm(value).value()
                 }
 
                 // Define a companion function which returns the info needed to interpret the encoding.
                 #[export_name = concat!(stringify!($name), "_info_")]
                 pub extern "C" fn type_info() -> f64 {
                     let info = <$ret as TypeInfo>::type_info();
-                    Wasm::from(info).value()
+                    IntoWasm::into_wasm(info).value()
                 }
             };
         )*
