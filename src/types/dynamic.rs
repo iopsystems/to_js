@@ -1,5 +1,7 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform, TypeInfo};
+use crate::IntoWasm;
+use crate::ToWasm;
 use crate::{Stash, Wasm};
 
 pub struct Dynamic {
@@ -59,6 +61,25 @@ impl From<DynamicArray> for Wasm {
     fn from(x: DynamicArray) -> Self {
         Stash(
             x.0.into_iter()
+                .flat_map(|x| [x.value.value(), x.type_info.value()])
+                .collect::<Vec<_>>()
+                .into_boxed_slice(),
+        )
+        .into()
+    }
+}
+
+impl ToWasm for Dynamic {
+    fn to_wasm(&self) -> Wasm {
+        Stash(vec![self.value.value(), self.type_info.value()].into_boxed_slice()).into_wasm()
+    }
+}
+
+impl ToWasm for DynamicArray {
+    fn to_wasm(&self) -> Wasm {
+        Stash(
+            self.0
+                .iter()
                 .flat_map(|x| [x.value.value(), x.type_info.value()])
                 .collect::<Vec<_>>()
                 .into_boxed_slice(),

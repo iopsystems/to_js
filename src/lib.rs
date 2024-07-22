@@ -19,7 +19,7 @@ pub use types::stash::{clear_stash, Stash};
 pub struct Wasm(f64);
 
 impl Wasm {
-    pub fn value(self) -> f64 {
+    pub fn value(&self) -> f64 {
         self.0
     }
 }
@@ -36,6 +36,30 @@ where
 {
     fn from(x: &T) -> Self {
         T::into(*x)
+    }
+}
+
+trait ToWasm {
+    fn to_wasm(&self) -> Wasm;
+}
+
+// The Wasmification process will call into_wasm.
+trait IntoWasm {
+    fn into_wasm(self) -> Wasm;
+}
+
+impl<T: ToWasm> IntoWasm for T {
+    fn into_wasm(self) -> Wasm {
+        self.to_wasm()
+    }
+}
+
+impl<T> ToWasm for &T
+where
+    T: Copy + ToWasm,
+{
+    fn to_wasm(&self) -> Wasm {
+        ToWasm::to_wasm(*self)
     }
 }
 

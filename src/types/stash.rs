@@ -1,5 +1,6 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{Info, TypeInfo};
+use crate::IntoWasm;
 use crate::Wasm;
 use std::sync::RwLock;
 
@@ -36,6 +37,19 @@ where
     }
 }
 
+impl<T> IntoWasm for Stash<T>
+where
+    T: Send + Sync + 'static,
+    for<'a> &'a T: Into<Wasm>,
+{
+    fn into_wasm(self) -> Wasm {
+        let value = self.0;
+        let wasm = (&value).into();
+        let mut vec = STASH.write().unwrap();
+        vec.push(Box::new(value));
+        wasm
+    }
+}
 // HasNiche impl
 //
 

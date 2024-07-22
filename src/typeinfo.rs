@@ -1,10 +1,12 @@
 // TypeInfo impl so that the JavaScript code can correctly handle values of every supported type
 //
 
+use crate::ToWasm;
 use crate::{U8Octet, Wasm};
 
 // TypedArray type if the return value is to be converted to a typed array
 // Variant order is mirrored in an array on the JavaScript side.
+#[derive(Copy, Clone)]
 pub enum ArrayType {
     U8,
     I8,
@@ -21,6 +23,7 @@ pub enum ArrayType {
 
 // Transformation function to be used before returning the value to the caller
 // Variant order is mirrored in an array on the JavaScript side.
+#[derive(Copy, Clone)]
 pub enum Transform {
     // Store the "array" Transforms used for packed arrays
     // in the same order (with the same discriminant) as the
@@ -106,6 +109,23 @@ impl From<Info> for Wasm {
             x.is_array as u8,
             x.array_type as u8,
             x.transform as u8,
+            0,
+            0,
+            0,
+            0,
+        ])
+        .into()
+    }
+}
+
+impl ToWasm for Info {
+    fn to_wasm(&self) -> Wasm {
+        // Encode the type info in the bottom 32 bits
+        U8Octet([
+            (self.is_result as u8) | ((self.is_option as u8) << 1),
+            self.is_array as u8,
+            self.array_type as u8,
+            self.transform as u8,
             0,
             0,
             0,
