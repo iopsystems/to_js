@@ -6,12 +6,6 @@ use crate::Wasm;
 // From<...> for Wasm impl
 //
 
-impl From<bool> for Wasm {
-    fn from(x: bool) -> Self {
-        Wasm(x as u8 as f64)
-    }
-}
-
 impl ToWasm for bool {
     fn to_wasm(&self) -> Wasm {
         Wasm(*self as u8 as f64)

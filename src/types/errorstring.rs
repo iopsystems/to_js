@@ -1,5 +1,5 @@
-use crate::types::stash::Stash;
 use crate::Wasm;
+use crate::{types::stash::Stash, IntoWasm};
 use std::ffi::{CStr, CString};
 
 // Error strings are a special internal type used to limit the Result Err variant
@@ -33,7 +33,7 @@ impl ErrorString for &str {
 impl ErrorString for CString {
     fn to_u32(self) -> u32 {
         // The Wasm encoding of a CString is a (ptr, len) pair
-        let wasm = Wasm::from(Stash(self)).value();
+        let wasm = Stash(self).into_wasm().value();
         // Extract and return the ptr, which is stored in the low bits
         wasm.to_bits() as u32
     }

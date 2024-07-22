@@ -101,23 +101,6 @@ impl Info {
     }
 }
 
-impl From<Info> for Wasm {
-    fn from(x: Info) -> Self {
-        // Encode the type info in the bottom 32 bits
-        U8Octet([
-            (x.is_result as u8) | ((x.is_option as u8) << 1),
-            x.is_array as u8,
-            x.array_type as u8,
-            x.transform as u8,
-            0,
-            0,
-            0,
-            0,
-        ])
-        .into()
-    }
-}
-
 impl ToWasm for Info {
     fn to_wasm(&self) -> Wasm {
         // Encode the type info in the bottom 32 bits
@@ -131,7 +114,7 @@ impl ToWasm for Info {
             0,
             0,
         ])
-        .into()
+        .to_wasm()
     }
 }
 
@@ -144,11 +127,11 @@ pub trait TypeInfo {
 // The type info for a reference is the same as the typeinfo for the value.
 // References are Wasm-ified assuming the memory they refer to will live at
 // least past the FFI boundary (after the Rust function returns).
-impl<T: TypeInfo> TypeInfo for &T {
-    fn type_info() -> Info {
-        <T as TypeInfo>::type_info()
-    }
-}
+// impl<T: TypeInfo> TypeInfo for &T {
+//     fn type_info() -> Info {
+//         <T as TypeInfo>::type_info()
+//     }
+// }
 
 #[macro_export]
 macro_rules! impl_typeinfo {

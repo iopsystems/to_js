@@ -21,8 +21,8 @@ impl Niche {
     pub(crate) fn new(self, x: u32) -> Wasm {
         const SIGNALING_NAN: u64 = 0xfff80000_00000000;
         match self {
-            Self::HighBitsNaN => f64::from_bits(SIGNALING_NAN | x as u64).into(),
-            Self::LowBitsOne => U32Pair([1, x]).into(),
+            Self::HighBitsNaN => f64::from_bits(SIGNALING_NAN | x as u64).into_wasm(),
+            Self::LowBitsOne => U32Pair([1, x]).into_wasm(),
         }
     }
 }

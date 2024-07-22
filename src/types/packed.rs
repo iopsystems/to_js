@@ -1,4 +1,5 @@
 use crate::typeinfo::{ArrayType, Transform};
+use crate::IntoWasm;
 use crate::ToWasm;
 use crate::Wasm;
 
@@ -44,13 +45,13 @@ impl From<U8Octet> for Wasm {
                 | ((b as u64) << 8)
                 | a as u64,
         )
-        .into()
+        .into_wasm()
     }
 }
 
 impl From<I8Octet> for Wasm {
     fn from(x: I8Octet) -> Self {
-        U8Octet(x.0.map(|x| x as u8)).into()
+        U8Octet(x.0.map(|x| x as u8)).into_wasm()
     }
 }
 
@@ -58,74 +59,74 @@ impl From<U16Quartet> for Wasm {
     fn from(x: U16Quartet) -> Self {
         let [a, b, c, d] = x.0;
         f64::from_bits(((d as u64) << 48) | ((c as u64) << 32) | ((b as u64) << 16) | a as u64)
-            .into()
+            .into_wasm()
     }
 }
 
 impl From<I16Quartet> for Wasm {
     fn from(x: I16Quartet) -> Self {
-        U16Quartet(x.0.map(|x| x as u16)).into()
+        U16Quartet(x.0.map(|x| x as u16)).into_wasm()
     }
 }
 
 impl From<U32Pair> for Wasm {
     fn from(x: U32Pair) -> Self {
         let [a, b] = x.0;
-        f64::from_bits(((b as u64) << 32) | a as u64).into()
+        f64::from_bits(((b as u64) << 32) | a as u64).into_wasm()
     }
 }
 
 impl From<I32Pair> for Wasm {
     fn from(x: I32Pair) -> Self {
-        U32Pair(x.0.map(|x| x as u32)).into()
+        U32Pair(x.0.map(|x| x as u32)).into_wasm()
     }
 }
 
 impl From<F32Pair> for Wasm {
     fn from(x: F32Pair) -> Self {
-        U32Pair(x.0.map(f32::to_bits)).into()
+        U32Pair(x.0.map(f32::to_bits)).into_wasm()
     }
 }
 
 impl ToWasm for U8Octet {
     fn to_wasm(&self) -> Wasm {
-        (*self).into()
+        (*self).into_wasm()
     }
 }
 
 impl ToWasm for I8Octet {
     fn to_wasm(&self) -> Wasm {
-        (*self).into()
+        (*self).into_wasm()
     }
 }
 
 impl ToWasm for U16Quartet {
     fn to_wasm(&self) -> Wasm {
-        (*self).into()
+        (*self).into_wasm()
     }
 }
 
 impl ToWasm for I16Quartet {
     fn to_wasm(&self) -> Wasm {
-        (*self).into()
+        (*self).into_wasm()
     }
 }
 
 impl ToWasm for U32Pair {
     fn to_wasm(&self) -> Wasm {
-        (*self).into()
+        (*self).into_wasm()
     }
 }
 
 impl ToWasm for I32Pair {
     fn to_wasm(&self) -> Wasm {
-        (*self).into()
+        (*self).into_wasm()
     }
 }
 
 impl ToWasm for F32Pair {
     fn to_wasm(&self) -> Wasm {
-        (*self).into()
+        (*self).into_wasm()
     }
 }
 

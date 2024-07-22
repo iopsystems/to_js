@@ -15,21 +15,12 @@ impl Dynamic {
     /// returned across the WebAssembly FFI boundary.
     pub fn new<T>(x: T) -> Self
     where
-        Stash<T>: Into<Wasm> + TypeInfo,
+        Stash<T>: IntoWasm + TypeInfo,
     {
         Self {
-            value: Stash(x).into(),
-            type_info: <Stash<T>>::type_info().into(),
+            value: Stash(x).into_wasm(),
+            type_info: <Stash<T>>::type_info().into_wasm(),
         }
-    }
-}
-
-impl<T> From<T> for Dynamic
-where
-    Stash<T>: Into<Wasm> + TypeInfo,
-{
-    fn from(x: T) -> Self {
-        Self::new(x)
     }
 }
 
@@ -37,54 +28,25 @@ where
 // and the specific implementation we want for a slice/vec of Dynamic values.
 pub struct DynamicArray(Vec<Dynamic>);
 
-impl<T> From<T> for DynamicArray
-where
-    T: Into<Vec<Dynamic>>,
-{
-    fn from(x: T) -> Self {
-        Self(x.into())
-    }
-}
-
 // From<...> for Wasm impl
 //
 
-impl From<Dynamic> for Wasm {
-    fn from(x: Dynamic) -> Self {
-        // A Dynamic is encoded like a DynamicArray, but has different TypeInfo so that
-        // it can be returned as a single element rather than an Array on the JS side.
-        DynamicArray(vec![x]).into()
-    }
-}
-
-impl From<DynamicArray> for Wasm {
-    fn from(x: DynamicArray) -> Self {
-        Stash(
-            x.0.into_iter()
-                .flat_map(|x| [x.value.value(), x.type_info.value()])
-                .collect::<Vec<_>>()
-                .into_boxed_slice(),
-        )
-        .into()
-    }
-}
-
-impl ToWasm for Dynamic {
-    fn to_wasm(&self) -> Wasm {
+impl IntoWasm for Dynamic {
+    fn into_wasm(self) -> Wasm {
         Stash(vec![self.value.value(), self.type_info.value()].into_boxed_slice()).into_wasm()
     }
 }
 
-impl ToWasm for DynamicArray {
-    fn to_wasm(&self) -> Wasm {
+impl IntoWasm for DynamicArray {
+    fn into_wasm(self) -> Wasm {
         Stash(
             self.0
-                .iter()
+                .into_iter()
                 .flat_map(|x| [x.value.value(), x.type_info.value()])
                 .collect::<Vec<_>>()
                 .into_boxed_slice(),
         )
-        .into()
+        .into_wasm()
     }
 }
 

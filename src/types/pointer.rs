@@ -1,5 +1,6 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Info, Transform, TypeInfo};
+use crate::IntoWasm;
 use crate::ToWasm;
 use crate::Wasm;
 
@@ -8,25 +9,25 @@ use crate::Wasm;
 
 impl<T> From<*const T> for Wasm {
     fn from(x: *const T) -> Self {
-        (x as u32).into()
+        (x as u32).into_wasm()
     }
 }
 
 impl<T> From<*mut T> for Wasm {
     fn from(x: *mut T) -> Self {
-        (x as u32).into()
+        (x as u32).into_wasm()
     }
 }
 
 impl<T> ToWasm for *const T {
     fn to_wasm(&self) -> Wasm {
-        (*self).into()
+        (*self).into_wasm()
     }
 }
 
 impl<T> ToWasm for *mut T {
     fn to_wasm(&self) -> Wasm {
-        (*self).into()
+        (*self).into_wasm()
     }
 }
 
