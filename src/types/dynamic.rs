@@ -13,7 +13,7 @@ pub struct Dynamic {
 impl Dynamic {
     /// Construct a new Dynamic value. All Dynamic construction goes through
     /// this function, ensuring that dynamic values are stashed before being
-    /// returned across the FFI boundary. The bounds are the same as those
+    /// returned across the FFI boundary. The bounds on T are the the those
     /// needed for stashable values.
     pub fn new<T>(x: T) -> Self
     where
@@ -62,8 +62,7 @@ impl ToWasm for &BTreeMap<&'static str, Dynamic> {
     fn to_wasm(&self) -> Wasm {
         self.iter()
             .map(|(k, v)| {
-                // we don't own the key or value, but we can clone them.
-                let key = Dynamic::new(String::from(*k));
+                let key = Dynamic::new(*k);
                 let value = v.clone();
                 Dynamic::new(vec![key, value].into_boxed_slice())
             })
