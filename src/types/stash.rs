@@ -3,17 +3,24 @@ use crate::typeinfo::{Info, TypeInfo};
 use crate::IntoWasm;
 use crate::ToWasm;
 use crate::Wasm;
+use std::marker::PhantomData;
 use std::sync::RwLock;
 
 // Global stash to keep values alive across FFI boundary until the next FFI call,
 // storing them in a vector of type-erased boxes, to be dropped when the next value is put in.
 static STASH: RwLock<Vec<Box<dyn Send + Sync + 'static>>> = RwLock::new(Vec::new());
 
-pub struct Stash<T>(pub T);
+pub struct Stash<T>(pub Wasm, pub PhantomData<T>);
 
-impl<T> From<T> for Stash<T> {
-    fn from(x: T) -> Self {
-        Stash(x)
+impl<T> Stash<T>
+where
+    T: Send + Sync + 'static,
+    for<'a> &'a T: IntoWasm,
+{
+    pub fn new(x: T) -> Self {
+        let wasm = (&x).into_wasm();
+        STASH.write().unwrap().push(Box::new(x));
+        return Self(wasm, PhantomData);
     }
 }
 
@@ -24,16 +31,13 @@ pub fn clear_stash() {
 // IntoWasm impl
 //
 
-impl<T> IntoWasm for Stash<T>
+impl<T> ToWasm for Stash<T>
 where
     T: Send + Sync + 'static,
     for<'a> &'a T: IntoWasm,
 {
-    fn into_wasm(self) -> Wasm {
-        let value = self.0;
-        let wasm = (&value).into_wasm();
-        STASH.write().unwrap().push(Box::new(value));
-        wasm
+    fn to_wasm(&self) -> Wasm {
+        Wasm(self.0 .0) // not sure why we don't just make Wasm Copy...
     }
 }
 

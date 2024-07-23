@@ -6,15 +6,9 @@ use crate::Wasm;
 // From<...> for Wasm impl
 //
 
-impl From<()> for Wasm {
-    fn from(_: ()) -> Self {
-        Wasm(0f64)
-    }
-}
-
 impl ToWasm for () {
     fn to_wasm(&self) -> Wasm {
-        (*self).into()
+        Wasm(0f64)
     }
 }
 

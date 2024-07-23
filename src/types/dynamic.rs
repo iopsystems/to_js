@@ -15,10 +15,11 @@ impl Dynamic {
     /// returned across the WebAssembly FFI boundary.
     pub fn new<T>(x: T) -> Self
     where
+        T: Send + Sync + 'static + ToWasm,
         Stash<T>: IntoWasm + TypeInfo,
     {
         Self {
-            value: Stash(x).into_wasm(),
+            value: Stash::new(x).into_wasm(),
             type_info: <Stash<T>>::type_info().into_wasm(),
         }
     }
@@ -33,13 +34,13 @@ pub struct DynamicArray(Vec<Dynamic>);
 
 impl ToWasm for Dynamic {
     fn to_wasm(&self) -> Wasm {
-        Stash(vec![self.value.value(), self.type_info.value()].into_boxed_slice()).into_wasm()
+        Stash::new(vec![self.value.value(), self.type_info.value()].into_boxed_slice()).into_wasm()
     }
 }
 
 impl ToWasm for &[Dynamic] {
     fn to_wasm(&self) -> Wasm {
-        Stash(
+        Stash::new(
             self.iter()
                 .flat_map(|x| [x.value.value(), x.type_info.value()])
                 .collect::<Vec<_>>()
@@ -51,7 +52,7 @@ impl ToWasm for &[Dynamic] {
 
 impl ToWasm for DynamicArray {
     fn to_wasm(&self) -> Wasm {
-        Stash(
+        Stash::new(
             self.0
                 .iter()
                 .flat_map(|x| [x.value.value(), x.type_info.value()])

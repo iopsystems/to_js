@@ -28,6 +28,7 @@ trait ToWasm {
     fn to_wasm(&self) -> Wasm;
 }
 
+// todo: can we get rid of IntoWasm entirely?
 pub trait IntoWasm {
     fn into_wasm(self) -> Wasm;
 }
