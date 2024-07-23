@@ -44,6 +44,7 @@ pub enum Transform {
     String,
     Dynamic,
     DynamicArray,
+    DynamicObject,
 }
 
 pub struct Info {
@@ -103,7 +104,9 @@ impl Info {
 
 impl ToWasm for Info {
     fn to_wasm(&self) -> Wasm {
-        // Encode the type info in the bottom 32 bits
+        // Encode the type info in the bottom 32 bits, which enables us to store
+        // the type info for a Dynamic value in a fat pointer, with the other 32
+        // bits pointing to the value it describes.
         U8Octet([
             (self.is_result as u8) | ((self.is_option as u8) << 1),
             self.is_array as u8,

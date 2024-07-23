@@ -2,7 +2,7 @@ use crate::types::packed::U32Pair;
 use crate::ToWasm;
 use crate::Wasm;
 
-/// Encoding strategies for marking Option<T> and Result<T> variants using a set of niche values,
+/// Encoding strategies for marking Option<T> and Result<T, E> variants using a set of niche values,
 /// allowing us to overlay those types into the same 64 bits as the original value.
 /// Each type that can be wrapped opts in to one of these strategies based on what niche it has
 /// available, so these types are declared here and imported in the individual types that use them.
@@ -32,8 +32,7 @@ pub(crate) trait HasNiche {
 }
 
 // Returning a reference to a value across the FFI boundary is treated the same as
-// returning the value itself (which would be put in a stash, and the reference returned),
-// so the niche is also the same.
+// returning the value itself (which would be put in a stash, and the reference returned)
 impl<T: HasNiche> HasNiche for &T {
     const N: Niche = T::N;
 }

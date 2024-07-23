@@ -20,7 +20,7 @@ pub use types::stash::{clear_stash, Stash};
 pub struct Wasm(f64);
 
 impl Wasm {
-    pub fn value(&self) -> f64 {
+    pub fn value(self) -> f64 {
         self.0
     }
 }
@@ -29,17 +29,15 @@ pub trait ToWasm {
     fn to_wasm(&self) -> Wasm;
 }
 
-// q: can we get rid of IntoWasm entirely?
-// a: no, since we need it for some types that
-pub trait IntoWasm {
-    fn into_wasm(self) -> Wasm;
-}
-
 // If T: ToWasm then &T: ToWasm
 impl<T: ToWasm> ToWasm for &T {
     fn to_wasm(&self) -> Wasm {
         (*self).to_wasm()
     }
+}
+
+pub trait IntoWasm {
+    fn into_wasm(self) -> Wasm;
 }
 
 // If T: ToWasm then T: IntoWasm

@@ -6,7 +6,10 @@ use crate::{ToWasm, Wasm};
 // ToWasm impl
 //
 
-impl<T: Number> ToWasm for &Vec<T> {
+impl<T> ToWasm for &Vec<T>
+where
+    for<'a> &'a [T]: ToWasm,
+{
     fn to_wasm(&self) -> Wasm {
         self.as_slice().to_wasm()
     }

@@ -50,13 +50,9 @@ export default function toJs(instance, alwaysCopyData) {
         Boolean,
         (x) => textDecoder.decode(x),
         dynamic,
-        (x) => {
-            const ret = [];
-            for (let i = 0; i < x.length; i += 2) {
-                ret.push(dynamic(x.slice(i, i + 2)));
-            }
-            return ret;
-        }
+        dynamicArray,
+        dynamicObject,
+        
     ];
 
     function cString(ptr) {
@@ -112,6 +108,18 @@ export default function toJs(instance, alwaysCopyData) {
         const transform = outputTransforms[transformIndex];
         const ret = transform(value);
         return slice ? ret.slice() : ret;
+    }
+
+    function dynamicArray(x) {
+        const ret = [];
+        for (let i = 0; i < x.length; i += 2) {
+            ret.push(dynamic(x.slice(i, i + 2)));
+        }
+        return ret;
+    }
+
+    function dynamicObject(x) {
+        return Object.fromEntries(dynamicArray(x));
     }
 
     return Object.fromEntries(

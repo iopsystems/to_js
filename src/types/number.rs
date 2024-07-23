@@ -8,7 +8,7 @@ pub(crate) trait Number: 'static + Send + Sync + Copy {}
 macro_rules! impl_number {
     ($( $type:ty $(,)? )*) => {
         $(
-            impl Number for $type { }
+            impl Number for $type {}
 
             impl ToWasm for $type {
                 fn to_wasm(&self) -> Wasm {
