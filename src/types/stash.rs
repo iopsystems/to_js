@@ -1,5 +1,6 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{Info, TypeInfo};
+use crate::IntoWasm;
 use crate::ToWasm;
 use crate::Wasm;
 use std::marker::PhantomData;
@@ -13,14 +14,14 @@ pub struct Stash<T>(pub Wasm, pub PhantomData<T>);
 
 // Eagerly write data into the Stash upon construction.
 // We do this here rather than in to_wasm since this allows us
-// to implement ToWasm rather than IntoWasm, which requires ownership
+// to implement ToWasm, which does not require ownership
 impl<T> Stash<T>
 where
     T: Send + Sync + 'static,
-    for<'a> &'a T: ToWasm,
+    for<'a> &'a T: IntoWasm,
 {
     pub fn new(x: T) -> Self {
-        let wasm = (&x).to_wasm();
+        let wasm = (&x).into_wasm();
         STASH.write().unwrap().push(Box::new(x));
         return Self(wasm, PhantomData);
     }
@@ -33,11 +34,7 @@ pub fn clear_stash() {
 // ToWasm impl
 //
 
-impl<T> ToWasm for Stash<T>
-where
-    T: Send + Sync + 'static,
-    for<'a> &'a T: ToWasm,
-{
+impl<T> ToWasm for Stash<T> {
     fn to_wasm(&self) -> Wasm {
         self.0.clone()
     }
