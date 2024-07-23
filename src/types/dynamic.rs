@@ -31,6 +31,12 @@ impl Dynamic {
 // Convenience constructors
 //
 
+impl<const N: usize> From<[Dynamic; N]> for Dynamic {
+    fn from(x: [Dynamic; N]) -> Self {
+        Dynamic::new(x.to_vec().into_boxed_slice())
+    }
+}
+
 impl From<Box<[Dynamic]>> for Dynamic {
     fn from(x: Box<[Dynamic]>) -> Self {
         Dynamic::new(x)
