@@ -16,7 +16,7 @@ impl<T: Number> ToWasm for &Vec<T> {
 // HasNiche impl
 //
 
-impl<T: Number> HasNiche for &Vec<T> {
+impl<T: Number> HasNiche for Vec<T> {
     const N: Niche = Niche::LowBitsOne;
 }
 

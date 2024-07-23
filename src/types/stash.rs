@@ -27,11 +27,11 @@ pub fn clear_stash() {
 impl<T> IntoWasm for Stash<T>
 where
     T: Send + Sync + 'static,
-    for<'a> &'a T: ToWasm, // This bound is required to be ToWasm since we need to Wasmify a reference to T
+    for<'a> &'a T: IntoWasm,
 {
     fn into_wasm(self) -> Wasm {
         let value = self.0;
-        let wasm = (&value).to_wasm();
+        let wasm = (&value).into_wasm();
         STASH.write().unwrap().push(Box::new(value));
         wasm
     }

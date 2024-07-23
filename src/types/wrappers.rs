@@ -4,6 +4,12 @@ use crate::types::errorstring::ErrorString;
 use crate::IntoWasm;
 use crate::Wasm;
 
+// Note: Since these implement IntoWasm directly (because they require
+// the ability to take ownership of their value, since eg. it might be
+// a Stash), they cannot themselves be put in a stash, which requires
+// a *reference* to T to be IntoWasm, eg. &Option, which cannot be done
+// due to the value ownership requirement.
+
 // We allow Option and Result as wrapper types, and they
 // apportion the available space of niches between them
 // to indicate None and Err return values, respectively.

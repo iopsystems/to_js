@@ -37,6 +37,18 @@ impl ToWasm for Dynamic {
     }
 }
 
+impl ToWasm for &[Dynamic] {
+    fn to_wasm(&self) -> Wasm {
+        Stash(
+            self.iter()
+                .flat_map(|x| [x.value.value(), x.type_info.value()])
+                .collect::<Vec<_>>()
+                .into_boxed_slice(),
+        )
+        .into_wasm()
+    }
+}
+
 impl ToWasm for DynamicArray {
     fn to_wasm(&self) -> Wasm {
         Stash(

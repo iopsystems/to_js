@@ -28,25 +28,43 @@ trait ToWasm {
     fn to_wasm(&self) -> Wasm;
 }
 
-// The Wasmification process will call into_wasm.
 pub trait IntoWasm {
     fn into_wasm(self) -> Wasm;
 }
 
-impl<T> IntoWasm for T
-where
-    for<'a> &'a T: ToWasm,
-{
-    fn into_wasm(self) -> Wasm {
-        (&self).to_wasm()
-    }
-}
-
+// - if T: ToWasm then &T: ToWasm
 impl<T: ToWasm> ToWasm for &T {
     fn to_wasm(&self) -> Wasm {
         (*self).to_wasm()
     }
 }
+
+// - if T: ToWasm then T: IntoWasm
+impl<T: ToWasm> IntoWasm for T {
+    fn into_wasm(self) -> Wasm {
+        self.to_wasm()
+    }
+}
+
+// // - if T: ToWasm then &T: IntoWasm
+// impl<T> IntoWasm for &T
+// where
+//     T: ToWasm,
+// {
+//     fn into_wasm(self) -> Wasm {
+//         (&self).to_wasm()
+//     }
+// }
+
+// // - if T: IntoWasm then &T: IntoWasm
+// impl<T> IntoWasm for &T
+// where
+//     for<'a> &'a T: IntoWasm,
+// {
+//     fn into_wasm(self) -> Wasm {
+//         (&self).into_wasm()
+//     }
+// }
 
 /// This macro is part of the API surface of this package. The other part is the #[js] proc macro, which calls this one.
 /// You can wrap a series of function definitions in this macro in order to export them to JavaScript via WebAssembly.
