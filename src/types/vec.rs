@@ -1,8 +1,7 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{Info, TypeInfo};
 use crate::types::number::Number;
-use crate::ToWasm;
-use crate::Wasm;
+use crate::{ToWasm, Wasm};
 
 // ToWasm impl
 //

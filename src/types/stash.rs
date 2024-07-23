@@ -1,8 +1,6 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{Info, TypeInfo};
-use crate::IntoWasm;
-use crate::ToWasm;
-use crate::Wasm;
+use crate::{IntoWasm, ToWasm, Wasm};
 use std::marker::PhantomData;
 use std::sync::RwLock;
 

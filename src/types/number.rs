@@ -1,7 +1,6 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform};
-use crate::ToWasm;
-use crate::Wasm;
+use crate::{ToWasm, Wasm};
 
 // todo: should this impl ToWasm? Can we get rid of to_f64?
 pub(crate) trait Number: 'static + Send + Sync + Copy {}

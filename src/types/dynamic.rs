@@ -1,7 +1,6 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform, TypeInfo};
-use crate::{IntoWasm, ToWasm};
-use crate::{Stash, Wasm};
+use crate::{IntoWasm, Stash, ToWasm, Wasm};
 
 pub struct Dynamic {
     value: Wasm,

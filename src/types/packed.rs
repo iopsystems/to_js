@@ -1,6 +1,5 @@
 use crate::typeinfo::{ArrayType, Transform};
-use crate::ToWasm;
-use crate::Wasm;
+use crate::{ToWasm, Wasm};
 
 // Packed arrays (encoded into 64 bits).
 // These are returned as arrays but make use of special

@@ -1,8 +1,7 @@
 use crate::niche::HasNiche;
 use crate::typeinfo::{Info, TypeInfo};
 use crate::types::errorstring::ErrorString;
-use crate::ToWasm;
-use crate::Wasm;
+use crate::{ToWasm, Wasm};
 
 // We allow Option and Result as wrapper types, and they
 // apportion the available space of niches between them
