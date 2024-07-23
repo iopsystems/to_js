@@ -69,6 +69,10 @@ impl HasNiche for Dynamic {
     const N: Niche = Niche::LowBitsOne;
 }
 
+impl HasNiche for Box<[Dynamic]> {
+    const N: Niche = Niche::LowBitsOne;
+}
+
 impl HasNiche for DynamicArray {
     const N: Niche = Niche::LowBitsOne;
 }
@@ -77,6 +81,7 @@ impl HasNiche for DynamicArray {
 //
 
 impl_typeinfo! {
-    [Dynamic,      ArrayType::F64, true, Transform::Dynamic],
-    [DynamicArray, ArrayType::F64, true, Transform::DynamicArray],
+    [Dynamic,        ArrayType::F64, true, Transform::Dynamic],
+    [DynamicArray,   ArrayType::F64, true, Transform::DynamicArray],
+    [Box<[Dynamic]>, ArrayType::F64, true, Transform::DynamicArray],
 }
