@@ -54,22 +54,18 @@ impl From<BTreeMap<&'static str, Dynamic>> for Dynamic {
 
 impl ToWasm for Dynamic {
     fn to_wasm(&self) -> Wasm {
-        Stash::new(
-            vec![self.value.clone().value(), self.type_info.clone().value()].into_boxed_slice(),
-        )
-        .to_wasm()
+        [self.clone()].into_wasm()
     }
 }
 
 impl ToWasm for &[Dynamic] {
     fn to_wasm(&self) -> Wasm {
-        Dynamic::new(
+        Stash::new(
             self.iter()
                 .flat_map(|x| [x.value.clone().value(), x.type_info.clone().value()])
-                .collect::<Vec<_>>()
-                .into_boxed_slice(),
+                .collect::<Box<[f64]>>(),
         )
-        .to_wasm()
+        .into_wasm()
     }
 }
 
@@ -79,17 +75,11 @@ impl ToWasm for &Box<[Dynamic]> {
     }
 }
 
-// todo: dynamic key to avoid extra allocs in this function when reusing a map?
 impl ToWasm for &BTreeMap<&'static str, Dynamic> {
     fn to_wasm(&self) -> Wasm {
         self.iter()
-            .flat_map(|(k, v)| {
-                let key = Dynamic::new(*k);
-                let value = v.clone();
-                [key, value]
-            })
-            .collect::<Vec<Dynamic>>()
-            .into_boxed_slice()
+            .flat_map(|(k, v)| [Dynamic::new(*k), v.clone()])
+            .collect::<Box<[Dynamic]>>()
             .into_wasm()
     }
 }

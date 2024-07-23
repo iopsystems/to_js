@@ -119,9 +119,7 @@ export default function toJs(instance, alwaysCopyData) {
 
     function dynamicObject(x) {
         const arr = dynamicArray(x);
-        return arr;
         const ret = {};
-        console.log('len:', x.length, arr);
         for (let i = 0; i < arr.length; i += 2) {
             ret[arr[i]] = arr[i + 1];
         }
