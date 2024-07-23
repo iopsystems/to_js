@@ -39,12 +39,13 @@ where
 // HasNiche impl
 //
 
-impl<T> HasNiche for Stash<T>
+impl<T: HasNiche> HasNiche for Stash<T>
 where
-    for<'a> &'a T: HasNiche,
     Stash<T>: IntoWasm,
 {
-    const N: Niche = <&T>::N;
+    // Since the niche for a reference is the same as the niche for the value
+    // (see niche.rs)
+    const N: Niche = T::N;
 }
 
 // TypeInfo impl

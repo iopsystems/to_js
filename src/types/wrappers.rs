@@ -15,35 +15,35 @@ use crate::Wasm;
 // From<...> for Wasm impl
 //
 
-impl<T: HasNiche + ToWasm> ToWasm for Option<T> {
-    fn to_wasm(&self) -> Wasm {
+impl<T: HasNiche + IntoWasm> IntoWasm for Option<T> {
+    fn into_wasm(self) -> Wasm {
         match self {
-            Some(x) => x.to_wasm(),
+            Some(x) => x.into_wasm(),
             None => T::N.new(0),
         }
     }
 }
 
-impl<T: HasNiche + ToWasm, E: ErrorString> IntoWasm for Result<Option<T>, E> {
+impl<T: HasNiche + IntoWasm, E: ErrorString> IntoWasm for Result<Option<T>, E> {
     fn into_wasm(self) -> Wasm {
-        self.transpose().to_wasm()
+        self.transpose().into_wasm()
     }
 }
 
-impl<T: HasNiche + ToWasm, E: ErrorString> ToWasm for Result<T, E> {
-    fn to_wasm(&self) -> Wasm {
+impl<T: HasNiche + IntoWasm, E: ErrorString> IntoWasm for Result<T, E> {
+    fn into_wasm(self) -> Wasm {
         match self {
-            Ok(value) => value.to_wasm(),
+            Ok(value) => value.into_wasm(),
             Err(e) => T::N.new(e.to_u32()),
         }
     }
 }
 
-impl<T: HasNiche + ToWasm, E: ErrorString> ToWasm for Option<Result<T, E>> {
-    fn to_wasm(&self) -> Wasm {
+impl<T: HasNiche + IntoWasm, E: ErrorString> IntoWasm for Option<Result<T, E>> {
+    fn into_wasm(self) -> Wasm {
         match self {
-            Some(value) => value.to_wasm(),
-            None => None::<T>.to_wasm(),
+            Some(value) => value.into_wasm(),
+            None => None::<T>.into_wasm(),
         }
     }
 }

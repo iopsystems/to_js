@@ -7,27 +7,15 @@ use crate::Wasm;
 // From<...> for Wasm impl
 //
 
-impl<T> From<*const T> for Wasm {
-    fn from(x: *const T) -> Self {
-        (x as u32).into_wasm()
-    }
-}
-
-impl<T> From<*mut T> for Wasm {
-    fn from(x: *mut T) -> Self {
-        (x as u32).into_wasm()
-    }
-}
-
 impl<T> ToWasm for *const T {
     fn to_wasm(&self) -> Wasm {
-        (*self).into_wasm()
+        (*self as u32).into_wasm()
     }
 }
 
 impl<T> ToWasm for *mut T {
     fn to_wasm(&self) -> Wasm {
-        (*self).into_wasm()
+        (*self as u32).into_wasm()
     }
 }
 

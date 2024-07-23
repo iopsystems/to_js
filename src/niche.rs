@@ -30,3 +30,10 @@ impl Niche {
 pub(crate) trait HasNiche {
     const N: Niche;
 }
+
+// Returning a reference to a value across the FFI boundary is treated the same as
+// returning the value itself (which would be put in a stash, and the reference returned),
+// so the niche is also the same.
+impl<T: HasNiche> HasNiche for &T {
+    const N: Niche = T::N;
+}
