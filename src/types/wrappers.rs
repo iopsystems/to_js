@@ -11,7 +11,7 @@ use crate::Wasm;
 // while Result uses all other (nonzero) values to point
 // to the error string.
 
-// From<...> for Wasm impl
+// ToWasm impl
 //
 
 impl<T: HasNiche + ToWasm> ToWasm for Option<T> {

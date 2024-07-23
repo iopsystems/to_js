@@ -31,7 +31,7 @@ impl Number for i64 {}
 
 // ToWasm impl
 // (implemented per-type for most number types in the macro above rather than with a blanket impl
-//  so as not to conflict with the blanket impl in lib.rs for From<&T> where T: Copy + Into<Wasm>)
+//  so as not to conflict with the blanket impl in lib.rs)
 
 impl ToWasm for u64 {
     fn to_wasm(&self) -> Wasm {

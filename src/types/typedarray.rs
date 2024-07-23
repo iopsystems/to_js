@@ -11,25 +11,25 @@ use crate::Wasm;
 
 impl<T: Number> ToWasm for &[T] {
     fn to_wasm(&self) -> Wasm {
-        U32Pair([self.as_ptr() as u32, self.len() as u32]).into_wasm()
+        U32Pair([self.as_ptr() as u32, self.len() as u32]).to_wasm()
     }
 }
 
 impl<T: Number> ToWasm for &Box<[T]> {
     fn to_wasm(&self) -> Wasm {
-        U32Pair([self.as_ptr() as u32, self.len() as u32]).into_wasm()
+        self[..].into_wasm()
     }
 }
 
 impl<T: Number> IntoWasm for &mut [T] {
     fn into_wasm(self) -> Wasm {
-        U32Pair([self.as_mut_ptr() as u32, self.len() as u32]).into_wasm()
+        U32Pair([self.as_mut_ptr() as u32, self.len() as u32]).to_wasm()
     }
 }
 
 impl<T: Number> IntoWasm for &mut Box<[T]> {
     fn into_wasm(self) -> Wasm {
-        U32Pair([self.as_mut_ptr() as u32, self.len() as u32]).into_wasm()
+        self[..].into_wasm()
     }
 }
 

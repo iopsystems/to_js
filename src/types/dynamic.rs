@@ -1,6 +1,6 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform, TypeInfo};
-use crate::ToWasm;
+use crate::{IntoWasm, ToWasm};
 use crate::{Stash, Wasm};
 
 pub struct Dynamic {
@@ -33,7 +33,7 @@ impl ToWasm for Dynamic {
     }
 }
 
-impl ToWasm for &Box<[Dynamic]> {
+impl ToWasm for &[Dynamic] {
     fn to_wasm(&self) -> Wasm {
         Stash::new(
             self.iter()
@@ -45,10 +45,20 @@ impl ToWasm for &Box<[Dynamic]> {
     }
 }
 
+impl ToWasm for &Box<[Dynamic]> {
+    fn to_wasm(&self) -> Wasm {
+        self[..].into_wasm()
+    }
+}
+
 // HasNiche impl
 //
 
 impl HasNiche for Dynamic {
+    const N: Niche = Niche::LowBitsOne;
+}
+
+impl HasNiche for &[Dynamic] {
     const N: Niche = Niche::LowBitsOne;
 }
 
@@ -60,6 +70,7 @@ impl HasNiche for &Box<[Dynamic]> {
 //
 
 impl_typeinfo! {
-    [Dynamic,        ArrayType::F64, true, Transform::Dynamic],
+    [Dynamic,         ArrayType::F64, true, Transform::Dynamic],
+    [&[Dynamic],      ArrayType::F64, true, Transform::DynamicArray],
     [&Box<[Dynamic]>, ArrayType::F64, true, Transform::DynamicArray],
 }
