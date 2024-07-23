@@ -42,7 +42,7 @@ impl ToWasm for Dynamic {
 
 impl ToWasm for &[Dynamic] {
     fn to_wasm(&self) -> Wasm {
-        Stash::new(
+        Dynamic::new(
             self.iter()
                 .flat_map(|x| [x.value.clone().value(), x.type_info.clone().value()])
                 .collect::<Vec<_>>()
@@ -73,7 +73,7 @@ impl ToWasm for &BTreeMap<&'static str, Dynamic> {
 }
 
 // HasNiche impl
-//
+// (Dynamics and composites of Dynamics are encoded as (ptr, len) via &Box<[T]>)
 
 impl HasNiche for Dynamic {
     const N: Niche = Niche::LowBitsOne;

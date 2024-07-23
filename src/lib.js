@@ -96,8 +96,7 @@ export default function toJs(instance, alwaysCopyData) {
     }
 
     function dynamic([value, typeInfo]) {
-        const [flags, isArray, arrayType, transformIndex] = u8Octet(typeInfo);
-        const isResult = flags & 1, isOption = flags & 2;
+        const [isResult, isOption, isArray, arrayType, transformIndex] = u8Octet(typeInfo);
         const isPackedArray = transformIndex < 7;
         const isIdentityTransform = transformIndex === 9;
         const slice = alwaysCopyData && (isPackedArray || (isArray && isIdentityTransform));
@@ -128,8 +127,7 @@ export default function toJs(instance, alwaysCopyData) {
             .map((nameWithSuffix) => {
                 const name = nameWithSuffix.slice(0, -6);
                 const typeInfo = u8Octet(instanceExports[`${name}_info_`]());
-                const [flags, isArray, arrayType, transformIndex] = typeInfo;
-                const isResult = flags & 1, isOption = flags & 2;
+                const [isResult, isOption, isArray, arrayType, transformIndex] = typeInfo;
                 const numArgs = instanceExports[name].length;
                 const args = Array.from({ length: numArgs }, (_, i) => `x${i + 1}`);
                 const argsAsString = args.join(", ");
