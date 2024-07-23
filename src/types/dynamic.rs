@@ -1,6 +1,5 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform, TypeInfo};
-use crate::IntoWasm;
 use crate::ToWasm;
 use crate::{Stash, Wasm};
 
@@ -19,8 +18,8 @@ impl Dynamic {
         Stash<T>: TypeInfo,
     {
         Self {
-            value: Stash::new(x).into_wasm(),
-            type_info: <Stash<T>>::type_info().into_wasm(),
+            value: Stash::new(x).to_wasm(),
+            type_info: <Stash<T>>::type_info().to_wasm(),
         }
     }
 }
@@ -30,7 +29,7 @@ impl Dynamic {
 
 impl ToWasm for Dynamic {
     fn to_wasm(&self) -> Wasm {
-        Stash::new(vec![self.value.value(), self.type_info.value()].into_boxed_slice()).into_wasm()
+        Stash::new(vec![self.value.value(), self.type_info.value()].into_boxed_slice()).to_wasm()
     }
 }
 
@@ -42,7 +41,7 @@ impl ToWasm for &Box<[Dynamic]> {
                 .collect::<Vec<_>>()
                 .into_boxed_slice(),
         )
-        .into_wasm()
+        .to_wasm()
     }
 }
 

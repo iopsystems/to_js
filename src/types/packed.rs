@@ -1,5 +1,4 @@
 use crate::typeinfo::{ArrayType, Transform};
-use crate::IntoWasm;
 use crate::ToWasm;
 use crate::Wasm;
 
@@ -8,25 +7,12 @@ use crate::Wasm;
 // preallocated arrays on the JavaScript side that
 // reinterpret the memory of a single-element Float64Array.
 
-#[derive(Copy, Clone)]
 pub struct U8Octet(pub [u8; 8]);
-
-#[derive(Copy, Clone)]
 pub struct I8Octet(pub [i8; 8]);
-
-#[derive(Copy, Clone)]
 pub struct U16Quartet(pub [u16; 4]);
-
-#[derive(Copy, Clone)]
 pub struct I16Quartet(pub [i16; 4]);
-
-#[derive(Copy, Clone)]
 pub struct U32Pair(pub [u32; 2]);
-
-#[derive(Copy, Clone)]
 pub struct I32Pair(pub [i32; 2]);
-
-#[derive(Copy, Clone)]
 pub struct F32Pair(pub [f32; 2]);
 
 // From<...> for Wasm impl
@@ -45,13 +31,13 @@ impl ToWasm for U8Octet {
                 | ((b as u64) << 8)
                 | a as u64,
         )
-        .into_wasm()
+        .to_wasm()
     }
 }
 
 impl ToWasm for I8Octet {
     fn to_wasm(&self) -> Wasm {
-        U8Octet(self.0.map(|x| x as u8)).into_wasm()
+        U8Octet(self.0.map(|x| x as u8)).to_wasm()
     }
 }
 
@@ -59,32 +45,32 @@ impl ToWasm for U16Quartet {
     fn to_wasm(&self) -> Wasm {
         let [a, b, c, d] = self.0;
         f64::from_bits(((d as u64) << 48) | ((c as u64) << 32) | ((b as u64) << 16) | a as u64)
-            .into_wasm()
+            .to_wasm()
     }
 }
 
 impl ToWasm for I16Quartet {
     fn to_wasm(&self) -> Wasm {
-        U16Quartet(self.0.map(|x| x as u16)).into_wasm()
+        U16Quartet(self.0.map(|x| x as u16)).to_wasm()
     }
 }
 
 impl ToWasm for U32Pair {
     fn to_wasm(&self) -> Wasm {
         let [a, b] = self.0;
-        f64::from_bits(((b as u64) << 32) | a as u64).into_wasm()
+        f64::from_bits(((b as u64) << 32) | a as u64).to_wasm()
     }
 }
 
 impl ToWasm for I32Pair {
     fn to_wasm(&self) -> Wasm {
-        U32Pair(self.0.map(|x| x as u32)).into_wasm()
+        U32Pair(self.0.map(|x| x as u32)).to_wasm()
     }
 }
 
 impl ToWasm for F32Pair {
     fn to_wasm(&self) -> Wasm {
-        U32Pair(self.0.map(f32::to_bits)).into_wasm()
+        U32Pair(self.0.map(f32::to_bits)).to_wasm()
     }
 }
 

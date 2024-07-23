@@ -1,5 +1,5 @@
 use crate::types::packed::U32Pair;
-use crate::IntoWasm;
+use crate::ToWasm;
 use crate::Wasm;
 
 /// Encoding strategies for marking Option<T> and Result<T> variants using a set of niche values,
@@ -21,8 +21,8 @@ impl Niche {
     pub(crate) fn new(self, x: u32) -> Wasm {
         const SIGNALING_NAN: u64 = 0xfff80000_00000000;
         match self {
-            Self::HighBitsNaN => f64::from_bits(SIGNALING_NAN | x as u64).into_wasm(),
-            Self::LowBitsOne => U32Pair([1, x]).into_wasm(),
+            Self::HighBitsNaN => f64::from_bits(SIGNALING_NAN | x as u64).to_wasm(),
+            Self::LowBitsOne => U32Pair([1, x]).to_wasm(),
         }
     }
 }
