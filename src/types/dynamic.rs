@@ -85,7 +85,7 @@ impl ToWasm for &BTreeMap<&'static str, Dynamic> {
             .map(|(k, v)| {
                 let key = Dynamic::new(*k);
                 let value = v.clone();
-                Dynamic::new(vec![key, value].into_boxed_slice())
+                [key, value].into()
             })
             .collect::<Vec<Dynamic>>()
             .into_boxed_slice()
