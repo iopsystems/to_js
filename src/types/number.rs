@@ -4,22 +4,16 @@ use crate::ToWasm;
 use crate::Wasm;
 
 // todo: should this impl ToWasm? Can we get rid of to_f64?
-pub(crate) trait Number: 'static + Send + Sync + Copy {
-    fn to_f64(self) -> f64;
-}
+pub(crate) trait Number: 'static + Send + Sync + Copy {}
 
 macro_rules! impl_number {
     ($( $type:ty $(,)? )*) => {
         $(
-            impl Number for $type {
-                fn to_f64(self) -> f64 {
-                    self as f64
-                }
-            }
+            impl Number for $type { }
 
             impl ToWasm for $type {
                 fn to_wasm(&self) -> Wasm {
-                   Wasm(self.to_f64())
+                   Wasm(*self as f64)
                 }
             }
 
@@ -32,17 +26,8 @@ macro_rules! impl_number {
 
 impl_number!(i8, i16, i32, u8, u16, u32, f32, f64, usize, isize);
 
-impl Number for u64 {
-    fn to_f64(self) -> f64 {
-        f64::from_bits(self)
-    }
-}
-
-impl Number for i64 {
-    fn to_f64(self) -> f64 {
-        (self as u64).to_f64()
-    }
-}
+impl Number for u64 {}
+impl Number for i64 {}
 
 // ToWasm impl
 // (implemented per-type for most number types in the macro above rather than with a blanket impl
@@ -50,13 +35,13 @@ impl Number for i64 {
 
 impl ToWasm for u64 {
     fn to_wasm(&self) -> Wasm {
-        Wasm(self.to_f64())
+        Wasm(f64::from_bits(*self))
     }
 }
 
 impl ToWasm for i64 {
     fn to_wasm(&self) -> Wasm {
-        Wasm(self.to_f64())
+        (*self as u64).to_wasm()
     }
 }
 
