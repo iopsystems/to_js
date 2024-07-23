@@ -32,9 +32,9 @@ pub struct F32Pair(pub [f32; 2]);
 // From<...> for Wasm impl
 //
 
-impl From<U8Octet> for Wasm {
-    fn from(x: U8Octet) -> Self {
-        let [a, b, c, d, e, f, g, h] = x.0;
+impl ToWasm for U8Octet {
+    fn to_wasm(&self) -> Wasm {
+        let [a, b, c, d, e, f, g, h] = self.0;
         f64::from_bits(
             ((h as u64) << 56)
                 | ((g as u64) << 48)
@@ -49,84 +49,42 @@ impl From<U8Octet> for Wasm {
     }
 }
 
-impl From<I8Octet> for Wasm {
-    fn from(x: I8Octet) -> Self {
-        U8Octet(x.0.map(|x| x as u8)).into_wasm()
-    }
-}
-
-impl From<U16Quartet> for Wasm {
-    fn from(x: U16Quartet) -> Self {
-        let [a, b, c, d] = x.0;
-        f64::from_bits(((d as u64) << 48) | ((c as u64) << 32) | ((b as u64) << 16) | a as u64)
-            .into_wasm()
-    }
-}
-
-impl From<I16Quartet> for Wasm {
-    fn from(x: I16Quartet) -> Self {
-        U16Quartet(x.0.map(|x| x as u16)).into_wasm()
-    }
-}
-
-impl From<U32Pair> for Wasm {
-    fn from(x: U32Pair) -> Self {
-        let [a, b] = x.0;
-        f64::from_bits(((b as u64) << 32) | a as u64).into_wasm()
-    }
-}
-
-impl From<I32Pair> for Wasm {
-    fn from(x: I32Pair) -> Self {
-        U32Pair(x.0.map(|x| x as u32)).into_wasm()
-    }
-}
-
-impl From<F32Pair> for Wasm {
-    fn from(x: F32Pair) -> Self {
-        U32Pair(x.0.map(f32::to_bits)).into_wasm()
-    }
-}
-
-impl ToWasm for U8Octet {
-    fn to_wasm(&self) -> Wasm {
-        (*self).into_wasm()
-    }
-}
-
 impl ToWasm for I8Octet {
     fn to_wasm(&self) -> Wasm {
-        (*self).into_wasm()
+        U8Octet(self.0.map(|x| x as u8)).into_wasm()
     }
 }
 
 impl ToWasm for U16Quartet {
     fn to_wasm(&self) -> Wasm {
-        (*self).into_wasm()
+        let [a, b, c, d] = self.0;
+        f64::from_bits(((d as u64) << 48) | ((c as u64) << 32) | ((b as u64) << 16) | a as u64)
+            .into_wasm()
     }
 }
 
 impl ToWasm for I16Quartet {
     fn to_wasm(&self) -> Wasm {
-        (*self).into_wasm()
+        U16Quartet(self.0.map(|x| x as u16)).into_wasm()
     }
 }
 
 impl ToWasm for U32Pair {
     fn to_wasm(&self) -> Wasm {
-        (*self).into_wasm()
+        let [a, b] = self.0;
+        f64::from_bits(((b as u64) << 32) | a as u64).into_wasm()
     }
 }
 
 impl ToWasm for I32Pair {
     fn to_wasm(&self) -> Wasm {
-        (*self).into_wasm()
+        U32Pair(self.0.map(|x| x as u32)).into_wasm()
     }
 }
 
 impl ToWasm for F32Pair {
     fn to_wasm(&self) -> Wasm {
-        (*self).into_wasm()
+        U32Pair(self.0.map(f32::to_bits)).into_wasm()
     }
 }
 

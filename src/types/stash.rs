@@ -32,8 +32,7 @@ where
     fn into_wasm(self) -> Wasm {
         let value = self.0;
         let wasm = value.to_wasm();
-        let mut vec = STASH.write().unwrap();
-        vec.push(Box::new(value));
+        STASH.write().unwrap().push(Box::new(value));
         wasm
     }
 }

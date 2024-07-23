@@ -27,6 +27,6 @@ impl Niche {
     }
 }
 
-pub(crate) trait HasNiche: IntoWasm {
+pub(crate) trait HasNiche {
     const N: Niche;
 }

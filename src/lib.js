@@ -114,7 +114,6 @@ export default function toJs(instance, alwaysCopyData) {
         return slice ? ret.slice() : ret;
     }
 
-    console.log('wut');
     return Object.fromEntries(
         Object.keys(instanceExports)
             .filter((d) => d.endsWith("_info_"))
@@ -124,7 +123,6 @@ export default function toJs(instance, alwaysCopyData) {
                 const [flags, isArray, arrayType, transformIndex] = typeInfo;
                 const isResult = flags & 1, isOption = flags & 2;
                 const numArgs = instanceExports[name].length;
-                log('numArgs', numArgs);
                 const args = Array.from({ length: numArgs }, (_, i) => `x${i + 1}`);
                 const argsAsString = args.join(", ");
                 const needsPair = isResult || isOption || isArray;
@@ -133,7 +131,6 @@ export default function toJs(instance, alwaysCopyData) {
                 const slice = alwaysCopyData && (isPackedArray || (isArray && isIdentityTransform));
                 // Compile a specialized function for each export using basic dead-code elimination to elide
                 // unnecessary transformations (eg. only include Option-processing code if the return value is an Option).
-                console.log('wut 2', 'name', name);
                 const fn = new Function(`exports`, `tryResult`, `tryOption`, `transform`, `u32Pair`, `
 return function ${name}(${argsAsString}) {
     if (arguments.length !== ${args.length}) {

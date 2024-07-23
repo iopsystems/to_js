@@ -2,6 +2,7 @@ use crate::niche::HasNiche;
 use crate::typeinfo::{Info, TypeInfo};
 use crate::types::errorstring::ErrorString;
 use crate::IntoWasm;
+use crate::ToWasm;
 use crate::Wasm;
 
 // We allow Option and Result as wrapper types, and they
@@ -14,35 +15,35 @@ use crate::Wasm;
 // From<...> for Wasm impl
 //
 
-impl<T: HasNiche> IntoWasm for Option<T> {
-    fn into_wasm(self) -> Wasm {
+impl<T: HasNiche + ToWasm> ToWasm for Option<T> {
+    fn to_wasm(&self) -> Wasm {
         match self {
-            Some(x) => x.into_wasm(),
+            Some(x) => x.to_wasm(),
             None => T::N.new(0),
         }
     }
 }
 
-impl<T: HasNiche, E: ErrorString> IntoWasm for Result<Option<T>, E> {
+impl<T: HasNiche + ToWasm, E: ErrorString> IntoWasm for Result<Option<T>, E> {
     fn into_wasm(self) -> Wasm {
-        self.transpose().into_wasm()
+        self.transpose().to_wasm()
     }
 }
 
-impl<T: HasNiche, E: ErrorString> IntoWasm for Result<T, E> {
-    fn into_wasm(self) -> Wasm {
+impl<T: HasNiche + ToWasm, E: ErrorString> ToWasm for Result<T, E> {
+    fn to_wasm(&self) -> Wasm {
         match self {
-            Ok(value) => value.into_wasm(),
+            Ok(value) => value.to_wasm(),
             Err(e) => T::N.new(e.to_u32()),
         }
     }
 }
 
-impl<T: HasNiche, E: ErrorString> IntoWasm for Option<Result<T, E>> {
-    fn into_wasm(self) -> Wasm {
+impl<T: HasNiche + ToWasm, E: ErrorString> ToWasm for Option<Result<T, E>> {
+    fn to_wasm(&self) -> Wasm {
         match self {
-            Some(value) => value.into_wasm(),
-            None => None::<T>.into_wasm(),
+            Some(value) => value.to_wasm(),
+            None => None::<T>.to_wasm(),
         }
     }
 }

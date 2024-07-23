@@ -127,11 +127,11 @@ pub trait TypeInfo {
 // The type info for a reference is the same as the typeinfo for the value.
 // References are Wasm-ified assuming the memory they refer to will live at
 // least past the FFI boundary (after the Rust function returns).
-// impl<T: TypeInfo> TypeInfo for &T {
-//     fn type_info() -> Info {
-//         <T as TypeInfo>::type_info()
-//     }
-// }
+impl<T: TypeInfo> TypeInfo for &T {
+    fn type_info() -> Info {
+        <T as TypeInfo>::type_info()
+    }
+}
 
 #[macro_export]
 macro_rules! impl_typeinfo {
