@@ -19,25 +19,10 @@ pub use types::stash::{clear_stash, Stash};
 pub struct Wasm(f64);
 
 impl Wasm {
-    pub fn value(self) -> f64 {
+    pub fn value(&self) -> f64 {
         self.0
     }
 }
-
-// For types that can be efficiently dereferenced, we allow their references to be serialized.
-// The workings of this library mean that functions are only converted into `Wasm`s when we are
-// confident that they will outlive the Rust side of the FFI call and be available on the JS side.
-// Adding this blanket implementation allows us to use basic types (bool, numbers, strings) together
-// with the more advanced features this library provides (Stash and Dynamic), since stashing a value
-// requires that a reference to that value is Into<Wasm>.
-// impl<T> From<&T> for Wasm
-// where
-//     T: Copy + Into<Wasm>,
-// {
-//     fn from(x: &T) -> Self {
-//         T::into(*x)
-//     }
-// }
 
 trait ToWasm {
     fn to_wasm(&self) -> Wasm;
@@ -48,38 +33,20 @@ pub trait IntoWasm {
     fn into_wasm(self) -> Wasm;
 }
 
-impl<T: ToWasm> IntoWasm for T {
+impl<T> IntoWasm for T
+where
+    for<'a> &'a T: ToWasm,
+{
     fn into_wasm(self) -> Wasm {
-        self.to_wasm()
+        (&self).to_wasm()
     }
 }
 
-// impl<T> IntoWasm for &T
-// where
-//     for<'a> &'a T: ToWasm,
-// {
-//     fn into_wasm(self) -> Wasm {
-//         self.to_wasm()
-//     }
-// }
-
-// impl<T> IntoWasm for &T
-// where
-//     for<'a> &'a T: IntoWasm,
-// {
-//     fn into_wasm(self) -> Wasm {
-//         self.into_wasm()
-//     }
-// }
-
-// impl<T> ToWasm for &T
-// where
-//     T: ToWasm,
-// {
-//     fn to_wasm(&self) -> Wasm {
-//         (*(*self)).to_wasm()
-//     }
-// }
+impl<T: ToWasm> ToWasm for &T {
+    fn to_wasm(&self) -> Wasm {
+        (*self).to_wasm()
+    }
+}
 
 /// This macro is part of the API surface of this package. The other part is the #[js] proc macro, which calls this one.
 /// You can wrap a series of function definitions in this macro in order to export them to JavaScript via WebAssembly.

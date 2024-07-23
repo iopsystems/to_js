@@ -21,41 +21,33 @@ pub fn clear_stash() {
     STASH.write().unwrap().clear();
 }
 
-// From<...> for Wasm impl
+// IntoWasm impl
 //
 
 impl<T> IntoWasm for Stash<T>
 where
     T: Send + Sync + 'static,
-    T: ToWasm,
+    for<'a> &'a T: ToWasm, // This bound is required to be ToWasm since we need to Wasmify a reference to T
 {
     fn into_wasm(self) -> Wasm {
         let value = self.0;
-        let wasm = value.to_wasm();
+        let wasm = (&value).to_wasm();
         STASH.write().unwrap().push(Box::new(value));
         wasm
     }
 }
+
 // HasNiche impl
 //
 
-impl<T: HasNiche> HasNiche for Stash<T>
-where
-    Stash<T>: IntoWasm,
-{
-    // Since the niche for a reference is the same as the niche for the value
-    // (see niche.rs)
-    const N: Niche = T::N;
+impl<T: HasNiche> HasNiche for Stash<T> {
+    const N: Niche = <&T>::N;
 }
 
 // TypeInfo impl
 //
 
-impl<T> TypeInfo for Stash<T>
-where
-    for<'a> &'a T: TypeInfo,
-{
-    // Info for a Stash<T> is the same as the Info for &T
+impl<T: TypeInfo> TypeInfo for Stash<T> {
     fn type_info() -> Info {
         <&T>::type_info()
     }

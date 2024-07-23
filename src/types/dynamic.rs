@@ -31,17 +31,17 @@ pub struct DynamicArray(Vec<Dynamic>);
 // From<...> for Wasm impl
 //
 
-impl IntoWasm for Dynamic {
-    fn into_wasm(self) -> Wasm {
+impl ToWasm for Dynamic {
+    fn to_wasm(&self) -> Wasm {
         Stash(vec![self.value.value(), self.type_info.value()].into_boxed_slice()).into_wasm()
     }
 }
 
-impl IntoWasm for DynamicArray {
-    fn into_wasm(self) -> Wasm {
+impl ToWasm for DynamicArray {
+    fn to_wasm(&self) -> Wasm {
         Stash(
             self.0
-                .into_iter()
+                .iter()
                 .flat_map(|x| [x.value.value(), x.type_info.value()])
                 .collect::<Vec<_>>()
                 .into_boxed_slice(),

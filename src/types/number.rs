@@ -3,6 +3,7 @@ use crate::typeinfo::{ArrayType, Transform};
 use crate::ToWasm;
 use crate::Wasm;
 
+// todo: should this impl ToWasm? Can we get rid of to_f64?
 pub(crate) trait Number: 'static + Send + Sync + Copy {
     fn to_f64(self) -> f64;
 }
@@ -16,11 +17,11 @@ macro_rules! impl_number {
                 }
             }
 
-            // impl ToWasm for $type {
-            //     fn to_wasm(&self) -> Wasm {
-            //         Wasm(self.to_f64())
-            //     }
-            // }
+            impl ToWasm for $type {
+                fn to_wasm(&self) -> Wasm {
+                   Wasm(self.to_f64())
+                }
+            }
 
             impl HasNiche for $type {
                 const N: Niche = Niche::HighBitsNaN;
@@ -37,17 +38,17 @@ impl Number for u64 {
     }
 }
 
-impl<T: Number> ToWasm for T {
-    fn to_wasm(&self) -> Wasm {
-        Wasm(self.to_f64())
-    }
-}
-
-// impl ToWasm for u64 {
+// impl<T: Number> ToWasm for T {
 //     fn to_wasm(&self) -> Wasm {
 //         Wasm(self.to_f64())
 //     }
 // }
+
+impl ToWasm for u64 {
+    fn to_wasm(&self) -> Wasm {
+        Wasm(self.to_f64())
+    }
+}
 
 impl Number for i64 {
     fn to_f64(self) -> f64 {
@@ -55,11 +56,11 @@ impl Number for i64 {
     }
 }
 
-// impl ToWasm for i64 {
-//     fn to_wasm(&self) -> Wasm {
-//         Wasm(self.to_f64())
-//     }
-// }
+impl ToWasm for i64 {
+    fn to_wasm(&self) -> Wasm {
+        Wasm(self.to_f64())
+    }
+}
 
 // From<...> for Wasm impl
 // (implemented per-type in the macro above rather than with a blanket impl

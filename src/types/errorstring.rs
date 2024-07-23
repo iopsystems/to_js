@@ -43,3 +43,9 @@ impl ErrorString for &CStr {
         self.as_ptr() as u32
     }
 }
+
+impl<T: ErrorString> ErrorString for &T {
+    fn to_u32(&self) -> u32 {
+        (*self).to_u32()
+    }
+}
