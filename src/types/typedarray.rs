@@ -15,7 +15,7 @@ impl<T: Number> ToWasm for &[T] {
     }
 }
 
-impl<T: Number> ToWasm for Box<[T]> {
+impl<T: Number> ToWasm for &Box<[T]> {
     fn to_wasm(&self) -> Wasm {
         U32Pair([self.as_ptr() as u32, self.len() as u32]).into_wasm()
     }
@@ -40,7 +40,7 @@ impl<T: Number> HasNiche for &[T] {
     const N: Niche = Niche::LowBitsOne;
 }
 
-impl<T: Number> HasNiche for Box<[T]> {
+impl<T: Number> HasNiche for &Box<[T]> {
     const N: Niche = Niche::LowBitsOne;
 }
 

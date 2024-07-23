@@ -24,7 +24,7 @@ impl Wasm {
     }
 }
 
-trait ToWasm {
+pub trait ToWasm {
     fn to_wasm(&self) -> Wasm;
 }
 

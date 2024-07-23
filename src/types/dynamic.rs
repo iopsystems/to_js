@@ -70,7 +70,7 @@ impl HasNiche for Dynamic {
     const N: Niche = Niche::LowBitsOne;
 }
 
-impl HasNiche for Box<[Dynamic]> {
+impl HasNiche for &Box<[Dynamic]> {
     const N: Niche = Niche::LowBitsOne;
 }
 

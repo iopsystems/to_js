@@ -12,6 +12,9 @@ static STASH: RwLock<Vec<Box<dyn Send + Sync + 'static>>> = RwLock::new(Vec::new
 
 pub struct Stash<T>(pub Wasm, pub PhantomData<T>);
 
+// Eagerly write data into the Stash upon construction.
+// We do this here rather than in to_wasm since this allows us
+// to implement ToWasm rather than IntoWasm, which requires ownership
 impl<T> Stash<T>
 where
     T: Send + Sync + 'static,
