@@ -87,6 +87,10 @@ impl HasNiche for &Box<[Dynamic]> {
     const N: Niche = Niche::LowBitsOne;
 }
 
+impl HasNiche for &BTreeMap<&'static str, Dynamic> {
+    const N: Niche = Niche::LowBitsOne;
+}
+
 // TypeInfo impl
 //
 
