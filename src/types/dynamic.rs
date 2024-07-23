@@ -79,13 +79,14 @@ impl ToWasm for &Box<[Dynamic]> {
     }
 }
 
+// todo: dynamic key to avoid extra allocs in this function when reusing a map?
 impl ToWasm for &BTreeMap<&'static str, Dynamic> {
     fn to_wasm(&self) -> Wasm {
         self.iter()
-            .map(|(k, v)| {
+            .flat_map(|(k, v)| {
                 let key = Dynamic::new(*k);
                 let value = v.clone();
-                [key, value].into()
+                [key, value]
             })
             .collect::<Vec<Dynamic>>()
             .into_boxed_slice()
