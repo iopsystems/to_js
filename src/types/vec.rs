@@ -4,7 +4,7 @@ use crate::types::number::Number;
 use crate::ToWasm;
 use crate::Wasm;
 
-// From<...> for Wasm impl
+// ToWasm impl
 //
 
 impl<T: Number> ToWasm for &Vec<T> {
@@ -16,14 +16,14 @@ impl<T: Number> ToWasm for &Vec<T> {
 // HasNiche impl
 //
 
-impl<T: Number> HasNiche for Vec<T> {
+impl<T: Number> HasNiche for &Vec<T> {
     const N: Niche = Niche::LowBitsOne;
 }
 
 // TypeInfo impl
 //
 
-impl<T: TypeInfo + Number> TypeInfo for Vec<T> {
+impl<T: TypeInfo + Number> TypeInfo for &Vec<T> {
     fn type_info() -> Info {
         <&[T]>::type_info()
     }

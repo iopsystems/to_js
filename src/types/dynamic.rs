@@ -24,7 +24,7 @@ impl Dynamic {
     }
 }
 
-// From<...> for Wasm impl
+// ToWasm impl
 //
 
 impl ToWasm for Dynamic {

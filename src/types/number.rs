@@ -38,21 +38,19 @@ impl Number for u64 {
     }
 }
 
-// impl<T: Number> ToWasm for T {
-//     fn to_wasm(&self) -> Wasm {
-//         Wasm(self.to_f64())
-//     }
-// }
+impl Number for i64 {
+    fn to_f64(self) -> f64 {
+        (self as u64).to_f64()
+    }
+}
+
+// ToWasm impl
+// (implemented per-type for most number types in the macro above rather than with a blanket impl
+//  so as not to conflict with the blanket impl in lib.rs for From<&T> where T: Copy + Into<Wasm>)
 
 impl ToWasm for u64 {
     fn to_wasm(&self) -> Wasm {
         Wasm(self.to_f64())
-    }
-}
-
-impl Number for i64 {
-    fn to_f64(self) -> f64 {
-        (self as u64).to_f64()
     }
 }
 
@@ -61,10 +59,6 @@ impl ToWasm for i64 {
         Wasm(self.to_f64())
     }
 }
-
-// From<...> for Wasm impl
-// (implemented per-type in the macro above rather than with a blanket impl
-//  so as not to conflict with the blanket impl in lib.rs for From<&T> where T: Copy + Into<Wasm>)
 
 // HasNiche impl
 // (There's no blanket implementation for Number since since not *all* numbers

@@ -1,6 +1,5 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{Info, TypeInfo};
-use crate::IntoWasm;
 use crate::ToWasm;
 use crate::Wasm;
 use std::marker::PhantomData;
@@ -18,10 +17,10 @@ pub struct Stash<T>(pub Wasm, pub PhantomData<T>);
 impl<T> Stash<T>
 where
     T: Send + Sync + 'static,
-    for<'a> &'a T: IntoWasm,
+    for<'a> &'a T: ToWasm,
 {
     pub fn new(x: T) -> Self {
-        let wasm = (&x).into_wasm();
+        let wasm = (&x).to_wasm();
         STASH.write().unwrap().push(Box::new(x));
         return Self(wasm, PhantomData);
     }
@@ -31,13 +30,13 @@ pub fn clear_stash() {
     STASH.write().unwrap().clear();
 }
 
-// IntoWasm impl
+// ToWasm impl
 //
 
 impl<T> ToWasm for Stash<T>
 where
     T: Send + Sync + 'static,
-    for<'a> &'a T: IntoWasm,
+    for<'a> &'a T: ToWasm,
 {
     fn to_wasm(&self) -> Wasm {
         self.0.clone()

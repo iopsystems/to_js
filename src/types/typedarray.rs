@@ -6,7 +6,7 @@ use crate::IntoWasm;
 use crate::ToWasm;
 use crate::Wasm;
 
-// From<...> for Wasm impl
+// ToWasm and IntoWasm impl
 //
 
 impl<T: Number> ToWasm for &[T] {

@@ -3,7 +3,7 @@ use crate::typeinfo::{ArrayType, Transform};
 use crate::ToWasm;
 use crate::Wasm;
 
-// From<...> for Wasm impl
+// ToWasm impl
 //
 
 impl ToWasm for () {

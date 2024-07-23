@@ -15,7 +15,7 @@ pub struct U32Pair(pub [u32; 2]);
 pub struct I32Pair(pub [i32; 2]);
 pub struct F32Pair(pub [f32; 2]);
 
-// From<...> for Wasm impl
+// ToWasm impl
 //
 
 impl ToWasm for U8Octet {

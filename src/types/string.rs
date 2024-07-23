@@ -4,7 +4,7 @@ use crate::ToWasm;
 use crate::Wasm;
 use std::ffi::{CStr, CString};
 
-// From<...> for Wasm impl
+// ToWasm impl
 //
 
 impl ToWasm for String {
