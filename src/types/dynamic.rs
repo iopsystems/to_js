@@ -28,6 +28,21 @@ impl Dynamic {
     }
 }
 
+// Convenience constructors
+//
+
+impl From<Box<[Dynamic]>> for Dynamic {
+    fn from(x: Box<[Dynamic]>) -> Self {
+        Dynamic::new(x)
+    }
+}
+
+impl From<BTreeMap<&'static str, Dynamic>> for Dynamic {
+    fn from(x: BTreeMap<&'static str, Dynamic>) -> Self {
+        Dynamic::new(x)
+    }
+}
+
 // ToWasm impl
 //
 
