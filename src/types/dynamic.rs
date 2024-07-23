@@ -5,12 +5,12 @@ use crate::typeinfo::{ArrayType, Transform, TypeInfo};
 use crate::{IntoWasm, Stash, ToWasm, Wasm};
 
 #[derive(Clone)]
-pub struct Dynamic {
+pub struct Dyn {
     value: Wasm,
     type_info: Wasm,
 }
 
-impl Dynamic {
+impl Dyn {
     /// Construct a new Dynamic value. All Dynamic construction goes through
     /// this function, ensuring that dynamic values are stashed before being
     /// returned across the FFI boundary. The bounds on T are the the those
@@ -31,34 +31,34 @@ impl Dynamic {
 // Convenience constructors
 //
 
-impl<const N: usize> From<[Dynamic; N]> for Dynamic {
-    fn from(x: [Dynamic; N]) -> Self {
-        Dynamic::new(x.to_vec().into_boxed_slice())
+impl<const N: usize> From<[Dyn; N]> for Dyn {
+    fn from(x: [Dyn; N]) -> Self {
+        Dyn::new(x.to_vec().into_boxed_slice())
     }
 }
 
-impl From<Box<[Dynamic]>> for Dynamic {
-    fn from(x: Box<[Dynamic]>) -> Self {
-        Dynamic::new(x)
+impl From<Box<[Dyn]>> for Dyn {
+    fn from(x: Box<[Dyn]>) -> Self {
+        Dyn::new(x)
     }
 }
 
-impl From<BTreeMap<&'static str, Dynamic>> for Dynamic {
-    fn from(x: BTreeMap<&'static str, Dynamic>) -> Self {
-        Dynamic::new(x)
+impl From<BTreeMap<&'static str, Dyn>> for Dyn {
+    fn from(x: BTreeMap<&'static str, Dyn>) -> Self {
+        Dyn::new(x)
     }
 }
 
 // ToWasm impl
 //
 
-impl ToWasm for Dynamic {
+impl ToWasm for Dyn {
     fn to_wasm(&self) -> Wasm {
         [self.clone()].into_wasm()
     }
 }
 
-impl ToWasm for &[Dynamic] {
+impl ToWasm for &[Dyn] {
     fn to_wasm(&self) -> Wasm {
         Stash::new(
             self.iter()
@@ -69,17 +69,17 @@ impl ToWasm for &[Dynamic] {
     }
 }
 
-impl ToWasm for &Box<[Dynamic]> {
+impl ToWasm for &Box<[Dyn]> {
     fn to_wasm(&self) -> Wasm {
         self[..].into_wasm()
     }
 }
 
-impl ToWasm for &BTreeMap<&'static str, Dynamic> {
+impl ToWasm for &BTreeMap<&'static str, Dyn> {
     fn to_wasm(&self) -> Wasm {
         self.iter()
-            .flat_map(|(k, v)| [Dynamic::new(*k), v.clone()])
-            .collect::<Box<[Dynamic]>>()
+            .flat_map(|(k, v)| [Dyn::new(*k), v.clone()])
+            .collect::<Box<[Dyn]>>()
             .into_wasm()
     }
 }
@@ -87,19 +87,19 @@ impl ToWasm for &BTreeMap<&'static str, Dynamic> {
 // HasNiche impl
 // (Dynamics and composites of Dynamics are encoded as (ptr, len) via &Box<[T]>)
 
-impl HasNiche for Dynamic {
+impl HasNiche for Dyn {
     const N: Niche = Niche::LowBitsOne;
 }
 
-impl HasNiche for &[Dynamic] {
+impl HasNiche for &[Dyn] {
     const N: Niche = Niche::LowBitsOne;
 }
 
-impl HasNiche for &Box<[Dynamic]> {
+impl HasNiche for &Box<[Dyn]> {
     const N: Niche = Niche::LowBitsOne;
 }
 
-impl HasNiche for &BTreeMap<&'static str, Dynamic> {
+impl HasNiche for &BTreeMap<&'static str, Dyn> {
     const N: Niche = Niche::LowBitsOne;
 }
 
@@ -107,8 +107,8 @@ impl HasNiche for &BTreeMap<&'static str, Dynamic> {
 //
 
 impl_typeinfo! {
-    [Dynamic,                          ArrayType::F64, true, Transform::Dynamic],
-    [&[Dynamic],                       ArrayType::F64, true, Transform::DynamicArray],
-    [&Box<[Dynamic]>,                  ArrayType::F64, true, Transform::DynamicArray],
-    [&BTreeMap<&'static str, Dynamic>, ArrayType::F64, true, Transform::DynamicObject],
+    [Dyn,                          ArrayType::F64, true, Transform::Dynamic],
+    [&[Dyn],                       ArrayType::F64, true, Transform::DynamicArray],
+    [&Box<[Dyn]>,                  ArrayType::F64, true, Transform::DynamicArray],
+    [&BTreeMap<&'static str, Dyn>, ArrayType::F64, true, Transform::DynamicObject],
 }
