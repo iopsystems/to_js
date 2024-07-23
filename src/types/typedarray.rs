@@ -61,7 +61,7 @@ impl<T: Number + TypeInfo> TypeInfo for &[T] {
     }
 }
 
-impl<T: Number + TypeInfo> TypeInfo for Box<[T]> {
+impl<T: Number + TypeInfo> TypeInfo for &Box<[T]> {
     fn type_info() -> Info {
         T::type_info().array().identity_transform()
     }

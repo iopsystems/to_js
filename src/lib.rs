@@ -10,12 +10,13 @@ mod niche;
 mod types;
 
 pub use typeinfo::TypeInfo;
-pub use types::dynamic::{Dynamic, DynamicArray};
+pub use types::dynamic::Dynamic;
 pub use types::packed::*;
 pub use types::stash::{clear_stash, Stash};
 
 // Wasm is the central type of this library and represents values that can be returned across the FFI boundary.
 // Individual types that we want to be serializable implement Into<Wasm> via impls of the `From` trait.
+#[derive(Clone)]
 pub struct Wasm(f64);
 
 impl Wasm {

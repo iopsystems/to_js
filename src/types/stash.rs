@@ -40,21 +40,27 @@ where
     for<'a> &'a T: IntoWasm,
 {
     fn to_wasm(&self) -> Wasm {
-        Wasm(self.0 .0) // not sure why we don't just make Wasm Copy...
+        self.0.clone()
     }
 }
 
 // HasNiche impl
 //
 
-impl<T: HasNiche> HasNiche for Stash<T> {
+impl<T> HasNiche for Stash<T>
+where
+    for<'a> &'a T: HasNiche,
+{
     const N: Niche = <&T>::N;
 }
 
 // TypeInfo impl
 //
 
-impl<T: TypeInfo> TypeInfo for Stash<T> {
+impl<T> TypeInfo for Stash<T>
+where
+    for<'a> &'a T: TypeInfo,
+{
     fn type_info() -> Info {
         <&T>::type_info()
     }

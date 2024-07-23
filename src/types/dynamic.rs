@@ -15,8 +15,8 @@ impl Dynamic {
     /// returned across the WebAssembly FFI boundary.
     pub fn new<T>(x: T) -> Self
     where
-        T: Send + Sync + 'static + ToWasm,
-        Stash<T>: IntoWasm + TypeInfo,
+        T: ToWasm + Send + Sync + 'static,
+        Stash<T>: TypeInfo,
     {
         Self {
             value: Stash::new(x).into_wasm(),
@@ -24,10 +24,6 @@ impl Dynamic {
         }
     }
 }
-
-// This type exists to resolve dispatch ambiguities between the vec/slice/box<[T] impls
-// and the specific implementation we want for a slice/vec of Dynamic values.
-pub struct DynamicArray(Vec<Dynamic>);
 
 // From<...> for Wasm impl
 //
@@ -38,23 +34,10 @@ impl ToWasm for Dynamic {
     }
 }
 
-impl ToWasm for &[Dynamic] {
+impl ToWasm for &Box<[Dynamic]> {
     fn to_wasm(&self) -> Wasm {
         Stash::new(
             self.iter()
-                .flat_map(|x| [x.value.value(), x.type_info.value()])
-                .collect::<Vec<_>>()
-                .into_boxed_slice(),
-        )
-        .into_wasm()
-    }
-}
-
-impl ToWasm for DynamicArray {
-    fn to_wasm(&self) -> Wasm {
-        Stash::new(
-            self.0
-                .iter()
                 .flat_map(|x| [x.value.value(), x.type_info.value()])
                 .collect::<Vec<_>>()
                 .into_boxed_slice(),
@@ -74,15 +57,10 @@ impl HasNiche for &Box<[Dynamic]> {
     const N: Niche = Niche::LowBitsOne;
 }
 
-impl HasNiche for DynamicArray {
-    const N: Niche = Niche::LowBitsOne;
-}
-
 // TypeInfo impl
 //
 
 impl_typeinfo! {
     [Dynamic,        ArrayType::F64, true, Transform::Dynamic],
-    [DynamicArray,   ArrayType::F64, true, Transform::DynamicArray],
-    [Box<[Dynamic]>, ArrayType::F64, true, Transform::DynamicArray],
+    [&Box<[Dynamic]>, ArrayType::F64, true, Transform::DynamicArray],
 }
