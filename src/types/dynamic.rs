@@ -4,7 +4,7 @@ use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform, TypeInfo};
 use crate::{IntoWasm, Stash, ToWasm, Wasm};
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Dynamic {
     value: Wasm,
     type_info: Wasm,
@@ -54,7 +54,7 @@ impl From<BTreeMap<&'static str, Dynamic>> for Dynamic {
 
 impl ToWasm for Dynamic {
     fn to_wasm(&self) -> Wasm {
-        [self.clone()].into_wasm()
+        [*self].into_wasm()
     }
 }
 
@@ -62,7 +62,7 @@ impl ToWasm for &[Dynamic] {
     fn to_wasm(&self) -> Wasm {
         Stash::new(
             self.iter()
-                .flat_map(|x| [x.value.clone().value(), x.type_info.clone().value()])
+                .flat_map(|x| [x.value.value(), x.type_info.value()])
                 .collect::<Box<[f64]>>(),
         )
         .into_wasm()
@@ -78,7 +78,7 @@ impl ToWasm for &Box<[Dynamic]> {
 impl ToWasm for &BTreeMap<&'static str, Dynamic> {
     fn to_wasm(&self) -> Wasm {
         self.iter()
-            .flat_map(|(k, v)| [Dynamic::new(*k), v.clone()])
+            .flat_map(|(k, v)| [Dynamic::new(*k), *v])
             .collect::<Box<[Dynamic]>>()
             .into_wasm()
     }

@@ -34,7 +34,7 @@ pub fn clear_stash() {
 
 impl<T> ToWasm for Stash<T> {
     fn to_wasm(&self) -> Wasm {
-        self.0.clone()
+        self.0
     }
 }
 
