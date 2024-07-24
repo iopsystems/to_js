@@ -16,7 +16,7 @@ pub use types::stash::{clear_stash, Stash};
 
 // Wasm is the central type of this library and represents values that can be returned across the FFI boundary.
 // Individual types that we want to be serializable implement Into<Wasm> via impls of the `From` trait.
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct Wasm(f64);
 
 impl Wasm {
