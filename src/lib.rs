@@ -53,7 +53,7 @@ impl<T: ToWasm> IntoWasm for T {
 /// since we use that macro capture ($ret) to figure out the TypeInfo for each function the user wants to export.
 #[macro_export]
 macro_rules! to_js {
-    ($( $(#[$meta:meta])* $vis:vis fn $name:ident($($arg:ident : $typ:ty),*) -> $ret:ty $body:block )*) => {
+    ($( $(#[$meta:meta])* $vis:vis fn $name:ident($($arg:ident : $typ:ty$(,)?)*) -> $ret:ty $body:block )*) => {
         $(
             // Define the original function
             $(#[$meta])*
@@ -86,13 +86,17 @@ macro_rules! to_js {
 // Convenience functions for JS-side resource lifetime management
 //
 
+/// Forgets about this value, ceding ownership to JS.
 pub fn allocate<T>(x: T) -> *mut T {
     Box::into_raw(Box::new(x))
 }
 
-pub unsafe fn deallocate<T>(ptr: *mut T) {
-    let x = unsafe { Box::from_raw(ptr) };
-    drop(x) // strictly speaking, we could omit this, but we include it for clarity.
+/// Remembers this value, taking ownerrship from JS.
+/// Returns a Box<T>, which will be deallocated upon drop.
+/// Note: This is a function to take ownership rather than
+/// explicitly drop, which is more general and useful.
+pub unsafe fn deallocate<T>(ptr: *mut T) -> Box<T> {
+    unsafe { Box::from_raw(ptr) }
 }
 
 /// A trick: We embed most of the JavaScript required to use the compiled .wasm file inside of the file itself by
