@@ -91,11 +91,12 @@ pub fn allocate<T>(x: T) -> *mut T {
     Box::into_raw(Box::new(x))
 }
 
-/// Remembers this value, taking ownerrship from JS.
+/// Remembers this value, taking ownership from JS.
+/// Assumes the pointer points to a valid but unowned T.
 /// Returns a Box<T>, which will be deallocated upon drop.
 /// Note: This is a function to take ownership rather than
 /// explicitly drop, which is more general and useful.
-pub unsafe fn deallocate<T>(ptr: *mut T) -> Box<T> {
+pub fn to_owned<T>(ptr: *mut T) -> Box<T> {
     unsafe { Box::from_raw(ptr) }
 }
 
