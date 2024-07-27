@@ -1,13 +1,58 @@
+use syn::{
+    parse::{Parse, ParseStream},
+    parse_macro_input, Ident, ItemFn, LitStr, Result, ReturnType,
+};
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, ItemFn, ReturnType};
+
+struct JsArgs {
+    prefix: Option<String>,
+}
+
+impl Parse for JsArgs {
+    /// Parses the args in #[js(prefix = "foo_")] to allow prefixing a function name.
+    /// Note that this will prefix not only the export but also the name of the function
+    /// on the Rust side, avoiding name collisions if a function with the same name is
+    /// exported multiple times, as it might be during a macro-driven generation process.
+    fn parse(input: ParseStream) -> Result<Self> {
+        let mut prefix = None;
+
+        // Parse the input stream to extract prefix argument if provided
+        while !input.is_empty() {
+            let lookahead = input.lookahead1();
+            if lookahead.peek(syn::Ident) {
+                let ident: Ident = input.parse()?;
+                let _eq_token: syn::Token![=] = input.parse()?;
+                let value: LitStr = input.parse()?;
+                if ident == "prefix" {
+                    prefix = Some(value.value());
+                }
+            }
+            if input.peek(syn::Token![,]) {
+                let _comma: syn::Token![,] = input.parse()?;
+            }
+        }
+
+        Ok(JsArgs { prefix })
+    }
+}
 
 #[proc_macro_attribute]
-pub fn js(_: TokenStream, input: TokenStream) -> TokenStream {
+pub fn js(attr: TokenStream, input: TokenStream) -> TokenStream {
     // Parse the input tokens into a syntax tree of a function item
     let mut item_fn: ItemFn = parse_macro_input!(input);
+
+    // Parse the attribute arguments
+    let args = parse_macro_input!(attr as JsArgs);
+
+    // Modify the function name by adding the prefix if provided
+    if let Some(prefix) = args.prefix {
+        let original_name = item_fn.sig.ident.to_string();
+        let new_name = format!("{}{}", prefix, original_name);
+        item_fn.sig.ident = Ident::new(&new_name, item_fn.sig.ident.span());
+    }
 
     // The to_js! macro requires functions to have an explicit return type,
     // so add it if one doesn't already exist.
