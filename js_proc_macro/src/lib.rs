@@ -17,7 +17,7 @@ impl Parse for JsArgs {
     /// on the Rust side, avoiding name collisions if a function with the same name is
     /// exported multiple times, as it might be during a macro-driven generation process.
     fn parse(input: ParseStream) -> Result<Self> {
-        let mut prefix = None;
+        let mut name_prefix = None;
 
         // Parse the input stream to extract prefix argument if provided
         while !input.is_empty() {
@@ -26,8 +26,8 @@ impl Parse for JsArgs {
                 let ident: Ident = input.parse()?;
                 let _eq_token: syn::Token![=] = input.parse()?;
                 let value: LitStr = input.parse()?;
-                if ident == "prefix" {
-                    prefix = Some(value.value());
+                if ident == "name_prefix" {
+                    name_prefix = Some(value.value());
                 }
             }
             if input.peek(syn::Token![,]) {
@@ -35,7 +35,9 @@ impl Parse for JsArgs {
             }
         }
 
-        Ok(JsArgs { prefix })
+        Ok(JsArgs {
+            prefix: name_prefix,
+        })
     }
 }
 
