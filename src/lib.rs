@@ -86,7 +86,7 @@ macro_rules! to_js {
 // Convenience functions for JS-side resource lifetime management
 //
 
-/// Forgets about this value, ceding ownership to JS.
+/// Allocates a new box and forgets about this value, ceding ownership to JS.
 pub fn allocate<T>(x: T) -> *mut T {
     Box::into_raw(Box::new(x))
 }

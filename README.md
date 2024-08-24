@@ -83,3 +83,43 @@ rs.vec(5) // => Uint32Array[1, 2, 3, 4, 5]
 rs.vec_result(5) // => Uint32Array[1, 2, 3, 4, 5]
 rs.vec_result(500) // => Error: I can't count that high.
 ```
+
+## Extras
+
+As an experimental feature, you can return dynamically-typed values using the `Dynamic` type:
+
+```rust
+#[js]
+fn string_or_int(x: u32) -> Result<Dynamic, &'static str> {
+    match x {
+        0..10 => Ok(Dynamic::new(String::from("hi from a String"))),
+        10..100 => Ok(Dynamic::new(123)),
+        _ => Err("no dynamic for you!"),
+    }
+}
+```
+
+You can return dynamic arrays (represented on the other side of the FFI boundary as JavaScript arrays):
+
+```rust
+#[js]
+fn dynamic_array() -> Stash<Box<[Dynamic]>> {
+    Stash::new(
+        [
+            Dynamic::new("hi"),
+            Dynamic::new(Some(123.0)),
+            Dynamic::new::<Option<&'static str>>(None),
+        ].into()
+    )
+}
+```
+
+And you can return dynamic objects (represented on the other side of the FFI boundary as JavaScript objects):
+
+```rust
+fn dynamic_object(x: u32) -> Dynamic {
+    BTreeMap::from([("key", Dynamic::new("value"))]).into()
+}
+```
+
+Dynamic values can be arbitrarily nested inside other dynamic values, which opens up opportunities for rapid prototyping and elegant API design. On the other hand, static return types are more efficient, so might be preferable them for the performance-sensitive parts of your API surface.
