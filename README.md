@@ -84,9 +84,9 @@ rs.vec_result(5) // => Uint32Array[1, 2, 3, 4, 5]
 rs.vec_result(500) // => Error: I can't count that high.
 ```
 
-## Extras
+## One more thing: Dynamic return types
 
-As an experimental feature, you can return dynamically-typed values using the `Dynamic` type:
+As an experimental feature you can return dynamically-typed values using the `Dynamic` type:
 
 ```rust
 #[js]
@@ -99,7 +99,7 @@ fn string_or_int(x: u32) -> Result<Dynamic, &'static str> {
 }
 ```
 
-You can return dynamic arrays, which are represented on the other side of the FFI boundary as plain JavaScript arrays:
+You can can return dynamic arrays, which are represented on the other side of the FFI boundary as plain [JavaScript arrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array):
 
 ```rust
 #[js]
@@ -114,7 +114,7 @@ fn dynamic_array() -> Stash<Box<[Dynamic]>> {
 }
 ```
 
-And you can return dynamic objects, which are represented on the other side of the FFI boundary as JavaScript objects:
+And you can return dynamic objects, which are represented on the other side of the FFI boundary as [JavaScript objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object):
 
 ```rust
 fn dynamic_object(x: u32) -> Dynamic {
