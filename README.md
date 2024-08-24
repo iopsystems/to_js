@@ -89,6 +89,8 @@ rs.vec_result(500) // => Error: I can't count that high.
 As an experimental feature you can return dynamically-typed values using the `Dynamic` type:
 
 ```rust
+use to_js::Dynamic;
+
 #[js]
 fn string_or_int(x: u32) -> Result<Dynamic, &'static str> {
     match x {
