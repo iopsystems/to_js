@@ -99,7 +99,7 @@ fn string_or_int(x: u32) -> Result<Dynamic, &'static str> {
 }
 ```
 
-You can return dynamic arrays (represented on the other side of the FFI boundary as JavaScript arrays):
+You can return dynamic arrays, which are represented on the other side of the FFI boundary as plain JavaScript arrays:
 
 ```rust
 #[js]
@@ -114,7 +114,7 @@ fn dynamic_array() -> Stash<Box<[Dynamic]>> {
 }
 ```
 
-And you can return dynamic objects (represented on the other side of the FFI boundary as JavaScript objects):
+And you can return dynamic objects, which are represented on the other side of the FFI boundary as JavaScript objects:
 
 ```rust
 fn dynamic_object(x: u32) -> Dynamic {
