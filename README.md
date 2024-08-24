@@ -122,4 +122,4 @@ fn dynamic_object(x: u32) -> Dynamic {
 }
 ```
 
-Dynamic values can be arbitrarily nested inside other dynamic values, which opens up opportunities for rapid prototyping and elegant API design. On the other hand, static return types are more efficient, so might be preferable them for the performance-sensitive parts of your API surface.
+Dynamic values can be arbitrarily nested inside other dynamic values, which opens up opportunities for rapid prototyping and elegant API design. On the other hand, static return types are more efficient, so you might prefer to use non-dynamic return types for the performance-sensitive parts of your API surface.
