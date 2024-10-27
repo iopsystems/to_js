@@ -31,16 +31,16 @@ fn slice() -> &'static [u32] {
 Returning owned values is accomplished by wrapping them in a `Stash`, which ensures the value lives until the next FFI call from JS to a Rust function.
 
 ```rust
-use to_js::Stash;
+use to_js::{stash, Stash};
 
 #[js]
 fn string() -> Stash<String> {
-    String::from("Hello from a String").into()
+    stash(String::from("Hello from a String"))
 }
 
 #[js]
 fn vec(count_up_to: usize) -> Stash<Vec<usize>> {
-    (1..=count_up_to).collect::<Vec<_>>().into()
+    stash((1..=count_up_to).collect::<Vec<_>>())
 }
 
 #[js]

@@ -8,21 +8,19 @@ use std::sync::RwLock;
 // storing them in a vector of type-erased boxes, to be dropped when the next value is put in.
 static STASH: RwLock<Vec<Box<dyn Send + Sync + 'static>>> = RwLock::new(Vec::new());
 
-pub struct Stash<T>(pub Wasm, pub PhantomData<T>);
+pub struct Stash<T>(Wasm, PhantomData<T>);
 
 // Eagerly write data into the Stash upon construction.
 // We do this here rather than in to_wasm since this allows us
 // to implement ToWasm, which does not require ownership
-impl<T> Stash<T>
+pub fn stash<T>(x: T) -> Stash<T>
 where
     T: Send + Sync + 'static,
     for<'a> &'a T: IntoWasm,
 {
-    pub fn new(x: T) -> Self {
-        let wasm = (&x).into_wasm();
-        STASH.write().unwrap().push(Box::new(x));
-        return Self(wasm, PhantomData);
-    }
+    let wasm = (&x).into_wasm();
+    STASH.write().unwrap().push(Box::new(x));
+    return Stash(wasm, PhantomData);
 }
 
 pub fn clear_stash() {

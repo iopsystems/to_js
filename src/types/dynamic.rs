@@ -1,5 +1,6 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform, TypeInfo};
+use crate::types::stash::stash;
 use crate::{IntoWasm, Stash, ToWasm, Wasm};
 
 #[derive(Clone)]
@@ -20,7 +21,7 @@ impl Dynamic {
         Stash<T>: TypeInfo,
     {
         Self {
-            value: Stash::new(x).to_wasm(),
+            value: stash(x).to_wasm(),
             type_info: <Stash<T>>::type_info().to_wasm(),
         }
     }
@@ -58,7 +59,7 @@ impl ToWasm for Dynamic {
 
 impl ToWasm for &[Dynamic] {
     fn to_wasm(&self) -> Wasm {
-        Stash::new(
+        stash(
             self.iter()
                 .flat_map(|x| [x.value.clone().value(), x.type_info.clone().value()])
                 .collect::<Box<[f64]>>(),
