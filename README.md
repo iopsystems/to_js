@@ -120,7 +120,7 @@ And you can return dynamic objects, which are represented on the other side of t
 
 ```rust
 fn dynamic_object(x: u32) -> Dynamic {
-    BTreeMap::from([("key", Dynamic::new("value"))]).into()
+    vec![("key", Dynamic::new("value"))].into_boxed_slice().into()
 }
 ```
 

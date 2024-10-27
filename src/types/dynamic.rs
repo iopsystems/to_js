@@ -1,5 +1,3 @@
-use std::collections::BTreeMap;
-
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform, TypeInfo};
 use crate::{IntoWasm, Stash, ToWasm, Wasm};
@@ -43,8 +41,8 @@ impl From<Box<[Dynamic]>> for Dynamic {
     }
 }
 
-impl From<BTreeMap<&'static str, Dynamic>> for Dynamic {
-    fn from(x: BTreeMap<&'static str, Dynamic>) -> Self {
+impl From<Box<[(&'static str, Dynamic)]>> for Dynamic {
+    fn from(x: Box<[(&'static str, Dynamic)]>) -> Self {
         Dynamic::new(x)
     }
 }
@@ -75,7 +73,16 @@ impl ToWasm for &Box<[Dynamic]> {
     }
 }
 
-impl ToWasm for &BTreeMap<&'static str, Dynamic> {
+impl ToWasm for &[(&'static str, Dynamic)] {
+    fn to_wasm(&self) -> Wasm {
+        self.iter()
+            .flat_map(|(k, v)| [Dynamic::new(*k), v.clone()])
+            .collect::<Box<[Dynamic]>>()
+            .into_wasm()
+    }
+}
+
+impl ToWasm for &Box<[(&'static str, Dynamic)]> {
     fn to_wasm(&self) -> Wasm {
         self.iter()
             .flat_map(|(k, v)| [Dynamic::new(*k), v.clone()])
@@ -99,7 +106,11 @@ impl HasNiche for &Box<[Dynamic]> {
     const N: Niche = Niche::LowBitsOne;
 }
 
-impl HasNiche for &BTreeMap<&'static str, Dynamic> {
+impl HasNiche for &[(&'static str, Dynamic)] {
+    const N: Niche = Niche::LowBitsOne;
+}
+
+impl HasNiche for &Box<[(&'static str, Dynamic)]> {
     const N: Niche = Niche::LowBitsOne;
 }
 
@@ -110,5 +121,6 @@ impl_typeinfo! {
     [Dynamic,                          ArrayType::F64, true, Transform::Dynamic],
     [&[Dynamic],                       ArrayType::F64, true, Transform::DynamicArray],
     [&Box<[Dynamic]>,                  ArrayType::F64, true, Transform::DynamicArray],
-    [&BTreeMap<&'static str, Dynamic>, ArrayType::F64, true, Transform::DynamicObject],
+    [&[(&'static str, Dynamic)],       ArrayType::F64, true, Transform::DynamicObject],
+    [&Box<[(&'static str, Dynamic)]>,  ArrayType::F64, true, Transform::DynamicObject],
 }
