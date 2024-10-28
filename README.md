@@ -52,7 +52,7 @@ fn count_vec_result(count_up_to: usize) -> Result<Stash<Vec<usize>>, &'static st
 }
 ```
 
-Alternatively, to hand the responsibility for lifetime management over to JavaScript, use the functions `alloc` and `dealloc`.
+Alternatively, to hand the responsibility for lifetime management over to JavaScript, use the provided functions `alloc` and `dealloc`.
 
 <details>
     <summary>Here's a real-world example that defines an [H2 histogram](https://h2histogram.org) type whose lifetype is managed by JavaScript.</summary>
@@ -127,11 +127,12 @@ fn h2_dealloc(ptr: *mut H2) -> () {
 }
 ```
 
-On the JavaScript side, you can use the following helper function to wrap these methods in the JavaScript class.
+On the JavaScript side you can use the following helper function to wrap these methods in the JavaScript class.
 
 ```js
 // Convenience method to generate a JavaScript-side class that corresponds to a Rust-side struct.
 function createClass(
+  // The object returned by `toJs(instance)`
   rs,
   {
     // Name prefix, shared by all methods (including the constructor)
@@ -141,7 +142,8 @@ function createClass(
     // Array of method names (sans prefix)
     methodNames,
     // Optional object from method name (sans prefix) to a wrapper function that can transforms the return value of the method.
-    // This is useful for eg. builder methods, and you can create a class for the built type whose constructor is `(ptr) => ptr`.
+    // This is useful for eg. builder build() methods, which can return a pointer to the Rust struct via `alloc`.
+    // To use the pointer you can create a class for the built type whose constructor is `(ptr) => ptr`.
     methodTransforms
   }
 ) {
@@ -163,18 +165,22 @@ function createClass(
   }
   return Class;
 }
+```
 
+This function can be used like so to define an `H2` class and use it:
+
+```js
 const H2 = createClass(rs, {
   namePrefix: "h2_",
   constructorName: "alloc",
   methodNames: ["encode", "decode", "dealloc"],
 })
 
-const hist = new H2(1, 8);
-const value = hist.encode(123); // => 61
-hist.dealloc();
-
+const hist = new H2(1, 8);      // Construct a Rust-side H2 struct
+const value = hist.encode(123); // Use it
+hist.dealloc();                 // Deallocate it when finished
 ```
+
 </details>
 
 ## Usage
