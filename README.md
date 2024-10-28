@@ -132,9 +132,9 @@ On the JavaScript side you can use the following helper function to wrap these m
 ```js
 // Convenience method to generate a JavaScript-side class that corresponds to a Rust-side struct.
 function createClass(
-  // The object returned by `toJs(instance)`
+  // The object returned by `toJs(instance)`.
   rs,
-  // Name prefix, shared by all methods
+  // Name prefix, shared by all methods. An trailing underscore will be appended if not present.
   prefix,
   {
     // Optional constructor function to override the default of `rs[prefix + 'alloc']`
@@ -147,6 +147,9 @@ function createClass(
 ) {
   // Allow the prefix to end with an underscore or not.
   if (!prefix.endsWith("_")) prefix += "_";
+
+  // Ensure that "dealloc" is listed as a method name
+  if (!names.includes("dealloc")) names.push("dealloc");
 
   // Create the constructor function and add method definitions to its prototype
   const Class = function (...args) {
@@ -169,9 +172,9 @@ function createClass(
 This function can be used to define an `H2` class and use it:
 
 ```js
-const H2 = createClass(rs, "h2", { names: ["encode", "decode", "dealloc"] })
+const H2 = createClass(rs, "h2", { names: ["encode", "decode"] })
 
-const hist = new H2(1, 8);      // Construct a Rust-side H2 struct
+const hist = new H2(1, 8);      // Construct a Rust-side H2 histogram struct
 const value = hist.encode(123); // Use it
 hist.dealloc();                 // Deallocate it when finished
 ```
