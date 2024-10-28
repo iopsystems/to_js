@@ -28,6 +28,38 @@ fn slice() -> &'static [u32] {
 }
 ```
 
+## Usage
+
+```js
+// Given a WebAssembly instance, return an object containing its #[js] exports.
+// If the optional second argument is true, typed arrays (including ones that
+// were stashed or returned as packed arrays) will be copied out of WebAssembly
+// memory before being returned, enhancing ease-of-use at the cost of extra data copies.
+function toJs(instance, alwaysCopyData) {
+  const view = new DataView(instance.exports.memory.buffer);
+  const ptr = view.getUint32(instance.exports.JS, true);
+  const len = view.getUint32(instance.exports.JS + 4, true);
+  const code = new TextDecoder().decode(view.buffer.slice(ptr, ptr + len));
+  return import(encodeURI("data:text/javascript," + code)).then((module) =>
+    module.default(instance, alwaysCopyData)
+  );
+}
+
+const rs = await WebAssembly.instantiateStreaming(
+  fetch(url /* url to the compiled .wasm file */)
+).then((results) => toJs(results.instance))
+
+rs.add(2, 2) // => 4
+rs.checked_add(2, 2) // => 4
+rs.checked_add(2 ** 31, 2 ** 31) // => null
+rs.str() // => "Hello from a &'static str"
+rs.slice() // => Float64Array[10, 20, 30]
+rs.string() // => "Hello from a String"
+rs.vec(5) // => Uint32Array[1, 2, 3, 4, 5]
+rs.vec_result(5) // => Uint32Array[1, 2, 3, 4, 5]
+rs.vec_result(500) // => Error: I can't count that high.
+```
+
 ## Memory management
 
 Returning owned values is accomplished by `stash`ing them temporarily, which ensures the value lives until the next FFI call from JS to a Rust function.
@@ -213,38 +245,6 @@ fn quartet() -> U16Quartet {
 fn f32_pair() -> F32Pair {
     F32Pair([1.0, 2.0])
 }
-```
-
-## Usage
-
-```js
-// Given a WebAssembly instance, return an object containing its #[js] exports.
-// If the optional second argument is true, typed arrays (including ones that
-// were stashed or returned as packed arrays) will be copied out of WebAssembly
-// memory before being returned, enhancing ease-of-use at the cost of extra data copies.
-function toJs(instance, alwaysCopyData) {
-  const view = new DataView(instance.exports.memory.buffer);
-  const ptr = view.getUint32(instance.exports.JS, true);
-  const len = view.getUint32(instance.exports.JS + 4, true);
-  const code = new TextDecoder().decode(view.buffer.slice(ptr, ptr + len));
-  return import(encodeURI("data:text/javascript," + code)).then((module) =>
-    module.default(instance, alwaysCopyData)
-  );
-}
-
-const rs = await WebAssembly.instantiateStreaming(
-  fetch(url /* url to the compiled .wasm file */)
-).then((results) => toJs(results.instance))
-
-rs.add(2, 2) // => 4
-rs.checked_add(2, 2) // => 4
-rs.checked_add(2 ** 31, 2 ** 31) // => null
-rs.str() // => "Hello from a &'static str"
-rs.slice() // => Float64Array[10, 20, 30]
-rs.string() // => "Hello from a String"
-rs.vec(5) // => Uint32Array[1, 2, 3, 4, 5]
-rs.vec_result(5) // => Uint32Array[1, 2, 3, 4, 5]
-rs.vec_result(500) // => Error: I can't count that high.
 ```
 
 ## Dynamic return types
