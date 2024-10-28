@@ -185,7 +185,7 @@ hist.dealloc();                 // Deallocate it when finished
 
 ## Packed arrays
 
-This library encodes all returned values into 64 bits with type information passed through a side channel. A nice consequence is that it can efficiently return small fixed-size ("packed") arrays without extra allocation, so long as they fit into 64 bits. Packed arrays will be returned as the appropriate type of typed array, reusing the same typed array object between calls.
+This library encodes all returned values into 64 bits with type information passed through a side channel. A nice consequence is that we can efficiently return small fixed-size ("packed") arrays without extra allocation, so long as they fit into 64 bits. Packed arrays will be returned as the appropriate type of typed array, reusing the same typed array object between calls.
 
 The packed array types are `U8Octet`, `I8Octet`, `U16Quartet`, `I16Quartet`, `U32Pair`, `I32Pair`, and `F32Pair`.
 
