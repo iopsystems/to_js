@@ -69,7 +69,7 @@ use to_js::{stash, Stash};
 
 #[js]
 fn string() -> Stash<String> {
-    stash(String::from("Hello from a String"))
+    stash("Hello from a String".to_string())
 }
 
 #[js]
@@ -256,7 +256,7 @@ use to_js::Dynamic;
 #[js]
 fn string_or_int(x: u32) -> Result<Dynamic, &'static str> {
     match x {
-        0..10 => Ok(Dynamic::new(String::from("hi from a String"))),
+        0..10 => Ok(Dynamic::new("hi from a String".to_string())),
         10..100 => Ok(Dynamic::new(123)),
         _ => Err("no dynamic for you!"),
     }
@@ -286,9 +286,9 @@ fn dynamic_object(x: u32) -> Dynamic {
 }
 ```
 
-Dynamic values can be arbitrarily nested, which opens up opportunities for rapid prototyping and elegant API design. On the other hand, static return types are more efficient, so you might prefer to use non-dynamic return types for the performance-sensitive parts of your API surface.
+`Dynamic` values can be arbitrarily nested, which opens up opportunities for rapid prototyping and elegant API design. On the other hand, static return types are more efficient, so you might prefer to use non-dynamic return types for the performance-sensitive parts of your API surface.
 
-. As another option, enabling the `json` feature allows you to use dtolnay's [miniserde](https://github.com/dtolnay/miniserde) to encode arbitrary types that are serialized as JSON across the language boundary.
+As another option, enabling the `json` feature allows you to use dtolnay's [miniserde](https://github.com/dtolnay/miniserde) to encode arbitrary types that are serialized as JSON across the language boundary.
 
 You can enable the feature by adding `features = ["json"]` to your `to_js` dependency in `Cargo.toml`.
 
@@ -306,7 +306,7 @@ struct TestJson {
 fn test_json() -> Json {
     json(TestJson {
         x: 123,
-        y: String::from("456!"),
+        y: "456!".to_string(),
     })
 }
 ```
