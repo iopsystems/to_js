@@ -28,6 +28,8 @@ fn slice() -> &'static [u32] {
 }
 ```
 
+## Memory management
+
 Returning owned values is accomplished by `stash`ing them temporarily, which ensures the value lives until the next FFI call from JS to a Rust function.
 
 ```rust
@@ -130,9 +132,9 @@ fn h2_dealloc(ptr: *mut H2) -> () {
 On the JavaScript side you can use the following helper function to wrap these methods in the JavaScript class.
 
 ```js
-// Convenience method to generate a JavaScript-side class that corresponds to a Rust-side struct.
+// Convenience function to generate a JavaScript class corresponding to a Rust struct.
 function createClass(
-  // The object returned by `toJs(instance)`.
+  // The fully-initialized WebAssembly instance, as returned by `toJs` (described in the Usage section)
   rs,
   // Name prefix, shared by all methods. An trailing underscore will be appended if not present.
   prefix,
@@ -180,6 +182,8 @@ hist.dealloc();                 // Deallocate it when finished
 ```
 
 </details>
+
+## Packed arrays
 
 This library encodes all returned values into 64 bits with type information passed through a side channel. A nice consequence is that it can efficiently return small fixed-size ("packed") arrays without extra allocation, so long as they fit into 64 bits. Packed arrays will be returned as the appropriate type of typed array, reusing the same typed array object between calls.
 
