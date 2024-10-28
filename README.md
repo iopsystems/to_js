@@ -219,7 +219,7 @@ hist.dealloc();                 // Deallocate it when finished
 
 This library encodes all returned values into 64 bits with type information passed through a side channel. A nice consequence is that we can efficiently return small fixed-size ("packed") arrays without extra allocation, so long as they fit into 64 bits. 
 
-Packed arrays will be returned as the appropriate type of typed array, reusing the same typed array object between calls. Note that all packed array data is internally represented by the same single-element `Float64Array`, so calls to any function returning a packed array will invalidate the results from the previous call that returned a packed array (see the `alwaysCopyData` argument to `toJs` in the Usage section below).
+Packed arrays will be returned as the appropriate type of typed array, reusing the same typed array object between calls. Note that all packed array data is internally represented by the same single-element `Float64Array`, so calls to any function returning a packed array will invalidate the results from the previous call that returned a packed array.
 
 The packed array types are `U8Octet`, `I8Octet`, `U16Quartet`, `I16Quartet`, `U32Pair`, `I32Pair`, and `F32Pair`.
 
