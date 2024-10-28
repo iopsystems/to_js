@@ -13,6 +13,8 @@ struct JsArgs {
 
 impl Parse for JsArgs {
     /// Parses the args in #[js(prefix = "foo_")] to allow prefixing a function name.
+    /// This is useful if you want to define a macro to define the same set of exports
+    /// for multiple structs.
     /// Note that this will prefix not only the export but also the name of the function
     /// on the Rust side, avoiding name collisions if a function with the same name is
     /// exported multiple times, as it might be during a macro-driven generation process.

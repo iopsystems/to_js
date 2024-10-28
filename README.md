@@ -106,7 +106,7 @@ You can can return dynamic arrays, which are represented on the other side of th
 ```rust
 #[js]
 fn dynamic_array() -> Stash<Box<[Dynamic]>> {
-    Stash::new(
+    stash(
         [
             Dynamic::new("hi"),
             Dynamic::new(Some(123.0)),
