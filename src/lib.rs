@@ -87,7 +87,7 @@ macro_rules! to_js {
 //
 
 /// Allocates a new box and forgets about this value, ceding ownership to JS.
-pub fn allocate<T>(x: T) -> *mut T {
+pub fn alloc<T>(x: T) -> *mut T {
     Box::into_raw(Box::new(x))
 }
 
@@ -95,8 +95,9 @@ pub fn allocate<T>(x: T) -> *mut T {
 /// Assumes the pointer points to a valid but unowned T.
 /// Returns a Box<T>, which will be deallocated upon drop.
 /// Note: This is a function to take ownership rather than
-/// explicitly drop, which is more general and useful.
-pub fn to_owned<T>(ptr: *mut T) -> Box<T> {
+/// explicitly drop, which is more general and useful, but
+/// we call it `dealloc` to suggest its primary use case.
+pub fn dealloc<T>(ptr: *mut T) -> Box<T> {
     unsafe { Box::from_raw(ptr) }
 }
 

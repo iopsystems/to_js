@@ -28,7 +28,7 @@ fn slice() -> &'static [u32] {
 }
 ```
 
-Returning owned values is accomplished by wrapping them in a `Stash`, which ensures the value lives until the next FFI call from JS to a Rust function.
+Returning owned values is accomplished by `stash`ing them temporarily, which ensures the value lives until the next FFI call from JS to a Rust function.
 
 ```rust
 use to_js::{stash, Stash};
@@ -39,18 +39,143 @@ fn string() -> Stash<String> {
 }
 
 #[js]
-fn vec(count_up_to: usize) -> Stash<Vec<usize>> {
+fn count_vec(count_up_to: usize) -> Stash<Vec<usize>> {
     stash((1..=count_up_to).collect::<Vec<_>>())
 }
 
 #[js]
-fn vec_result(count_up_to: usize) -> Result<Stash<Vec<usize>>, &'static str> {
+fn count_vec_result(count_up_to: usize) -> Result<Stash<Vec<usize>>, &'static str> {
     if count_up_to > 100 {
         return Err("I can't count that high.");
     }
-    Ok(vec(count_up_to))
+    Ok(count_vec(count_up_to))
 }
 ```
+
+Alternatively, to hand the responsibility for lifetime management over to JavaScript, use the functions `alloc` and `dealloc`.
+
+<details>
+    <summary>Here's a real-world example that defines an [H2 histogram](https://h2histogram.org) type whose lifetype is managed by JavaScript.</summary>
+
+```rust
+use to_js::{alloc, dealloc};
+
+#[derive(Copy, Clone)]
+struct H2 {
+    a: u32,
+    b: u32,
+}
+
+impl H2 {
+    fn new(a: u32, b: u32) -> Self {
+        H2 { a, b }
+    }
+
+    fn encode(self, value: u32) -> u32 {
+        let H2 { a, b } = self;
+        let c = a + b + 1;
+        if value < (1 << c) {
+            value >> a
+        } else {
+            let log_segment = 31 - value.leading_zeros();
+            (value >> (log_segment - b)) + ((log_segment - c + 1) << b)
+        }
+    }
+
+    fn decode(self, code: u32) -> [u32; 2] {
+        let H2 { a, b } = self;
+        let c = a + b + 1;
+        let bins_below_cutoff = 1 << (c - a);
+        let lower: u32;
+        let bin_width: u32;
+        if code < bins_below_cutoff {
+            // we're in the linear section of the histogram where each bin is 2^a wide
+            lower = code << a;
+            bin_width = 1 << a;
+        } else {
+            // we're in the log section of the histogram with 2^b bins per log segment
+            let log_segment = c + ((code - bins_below_cutoff) >> b);
+            let bin_offset = code & ((1 << b) - 1);
+            lower = (1 << log_segment) + (bin_offset << (log_segment - b));
+            bin_width = 1 << (log_segment - b);
+        };
+        [lower, lower + (bin_width - 1)]
+    }
+}
+
+#[js]
+fn h2_alloc(a: u32, b: u32) -> Result<*mut H2, &'static str> {
+    if a + b + 1 > 31 {
+        return Err("a + b + 1 must be < 32 or operations will overflow");
+    }
+    Ok(alloc(H2::new(a, b)))
+}
+
+#[js]
+fn h2_encode(x: &H2, value: u32) -> u32 {
+    x.encode(value)
+}
+
+#[js]
+fn h2_decode(x: &H2, code: u32) -> U32Pair {
+    U32Pair(x.decode(code))
+}
+
+#[js]
+fn h2_dealloc(ptr: *mut H2) -> () {
+    dealloc(ptr);
+}
+```
+
+On the JavaScript side, you can use the following helper function to wrap these methods in the JavaScript class.
+
+```js
+// Convenience method to generate a JavaScript-side class that corresponds to a Rust-side struct.
+function createClass(
+  rs,
+  {
+    // Name prefix, shared by all methods (including the constructor)
+    namePrefix,
+    // Name of the constructor (sans prefix)
+    constructorName,
+    // Array of method names (sans prefix)
+    methodNames,
+    // Optional object from method name (sans prefix) to a wrapper function that can transforms the return value of the method.
+    // This is useful for eg. builder methods, and you can create a class for the built type whose constructor is `(ptr) => ptr`.
+    methodTransforms
+  }
+) {
+  // Create the constructor function and add method definitions to its prototype
+  const constructor = rs[namePrefix + constructorName];
+  const Class = function (...args) {
+    this.ptr = constructor(...args);
+  };
+  const identity = (x) => x;
+  for (const nameSuffix of methodNames) {
+    const methodName = namePrefix + nameSuffix;
+    const method = rs[methodName];
+    // Optional method-specific transform applied to the result the Rust call
+    const transform = methodTransforms?.[nameSuffix] ?? identity;
+    const name = method.name.slice(namePrefix.length);
+    Class.prototype[name] = function (...args) {
+      return transform(method(this.ptr, ...args));
+    };
+  }
+  return Class;
+}
+
+const H2 = createClass(rs, {
+  namePrefix: "h2_",
+  constructorName: "alloc",
+  methodNames: ["encode", "decode", "dealloc"],
+})
+
+const hist = new H2(1, 8);
+const value = hist.encode(123); // => 61
+hist.dealloc();
+
+```
+</details>
 
 ## Usage
 
