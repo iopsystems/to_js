@@ -185,7 +185,9 @@ hist.dealloc();                 // Deallocate it when finished
 
 ## Packed arrays
 
-This library encodes all returned values into 64 bits with type information passed through a side channel. A nice consequence is that we can efficiently return small fixed-size ("packed") arrays without extra allocation, so long as they fit into 64 bits. Packed arrays will be returned as the appropriate type of typed array, reusing the same typed array object between calls.
+This library encodes all returned values into 64 bits with type information passed through a side channel. A nice consequence is that we can efficiently return small fixed-size ("packed") arrays without extra allocation, so long as they fit into 64 bits. 
+
+Packed arrays will be returned as the appropriate type of typed array, reusing the same typed array object between calls. Note that all packed array data is internally represented by the same single-element `Float64Array`, so calls to any function returning a packed array will invalidate the results from the previous call that returned a packed array (see the `alwaysCopyData` argument to `toJs` in the Usage section below).
 
 The packed array types are `U8Octet`, `I8Octet`, `U16Quartet`, `I16Quartet`, `U32Pair`, `I32Pair`, and `F32Pair`.
 
@@ -218,7 +220,7 @@ fn f32_pair() -> F32Pair {
 ```js
 // Given a WebAssembly instance, return an object containing its #[js] exports.
 // If the optional second argument is true, typed arrays (including ones that
-// were stashed or returned as "packed" arrays) will be copied out of WebAssembly
+// were stashed or returned as packed arrays) will be copied out of WebAssembly
 // memory before being returned, enhancing ease-of-use at the cost of extra data copies.
 function toJs(instance, alwaysCopyData) {
   const view = new DataView(instance.exports.memory.buffer);
