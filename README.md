@@ -166,7 +166,7 @@ On the JavaScript side you can use the following helper function to wrap these m
 ```js
 // Convenience function to generate a JavaScript class corresponding to a Rust struct.
 function createClass(
-  // The fully-initialized WebAssembly instance, as returned by `toJs` (described in the Usage section)
+  // The fully-initialized WebAssembly instance, as returned by `toJs`
   rs,
   // Name prefix, shared by all methods. An trailing underscore will be appended if not present.
   prefix,
