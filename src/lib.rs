@@ -11,6 +11,8 @@ mod types;
 
 pub use typeinfo::TypeInfo;
 pub use types::dynamic::Dynamic;
+#[cfg(feature = "json")]
+pub use types::json::{json, Json};
 pub use types::packed::*;
 pub use types::stash::{clear_stash, stash, Stash};
 

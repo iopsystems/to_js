@@ -34,7 +34,7 @@ export default function toJs(instance, alwaysCopyData) {
     const textDecoder = new TextDecoder();
     const instanceExports = instance.exports;
 
-    // In enum variant order (OutputTransform)
+    // In enum variant order (Transform)
     const outputTransforms = [
         u8Octet,
         i8Octet,
@@ -52,7 +52,7 @@ export default function toJs(instance, alwaysCopyData) {
         dynamic,
         dynamicArray,
         dynamicObject,
-        
+        (x) => JSON.parse(textDecoder.decode(x)),
     ];
 
     function cString(ptr) {

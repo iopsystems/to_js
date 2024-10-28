@@ -17,8 +17,10 @@ debug-assertions = true
 
 [dependencies]
 js_proc_macro = { path = "./js_proc_macro" }
+miniserde = "0.1" # hopefully i do not regret this. we can always make it a feature...
 
 [features]
 default = ["proc-macro"]
 proc-macro = []
+json = []
 

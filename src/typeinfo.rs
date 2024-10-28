@@ -45,6 +45,7 @@ pub enum Transform {
     Dynamic,
     DynamicArray,
     DynamicObject,
+    Json,
 }
 
 pub struct Info {

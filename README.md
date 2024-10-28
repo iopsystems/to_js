@@ -164,11 +164,11 @@ fn h2_dealloc(ptr: *mut H2) -> () {
 On the JavaScript side you can use the following helper function to wrap these methods in the JavaScript class.
 
 ```js
-// Convenience function to generate a JavaScript class corresponding to a Rust struct.
+// Convenience method to generate a JavaScript-side class that corresponds to a Rust-side struct.
 function createClass(
-  // The fully-initialized WebAssembly instance, as returned by `toJs`
+  // The object returned by `toJs(instance)`
   rs,
-  // Name prefix, shared by all methods. An trailing underscore will be appended if not present.
+  // Name prefix, shared by all methods, without trailing underscore
   prefix,
   {
     // Optional constructor function to override the default of `rs[prefix + 'alloc']`
@@ -179,8 +179,7 @@ function createClass(
     transforms
   }
 ) {
-  // Allow the prefix to end with an underscore or not.
-  if (!prefix.endsWith("_")) prefix += "_";
+  prefix += "_";
 
   // Ensure that "dealloc" is listed as a method name
   if (!names.includes("dealloc")) names.push("dealloc");
@@ -288,3 +287,28 @@ fn dynamic_object(x: u32) -> Dynamic {
 ```
 
 Dynamic values can be arbitrarily nested, which opens up opportunities for rapid prototyping and elegant API design. On the other hand, static return types are more efficient, so you might prefer to use non-dynamic return types for the performance-sensitive parts of your API surface.
+
+. As another option, enabling the `json` feature allows you to use dtolnay's [miniserde](https://github.com/dtolnay/miniserde) to encode arbitrary types that are serialized as JSON across the language boundary.
+
+You can enable the feature by adding `features = ["json"]` to your `to_js` dependency in `Cargo.toml`.
+
+```rust
+use miniserde::Serialize;
+use to_js::{json, Json};
+
+#[derive(Serialize)]
+struct TestJson {
+    x: u32,
+    y: String,
+}
+
+#[js]
+fn test_json() -> Json {
+    json(TestJson {
+        x: 123,
+        y: String::from("456!"),
+    })
+}
+```
+
+Calling this function from JavaScript will return a JavaScript object: `{ x: 123, y: "456!" }`.
