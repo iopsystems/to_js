@@ -55,7 +55,7 @@ fn count_vec_result(count_up_to: usize) -> Result<Stash<Vec<usize>>, &'static st
 Alternatively, to hand the responsibility for lifetime management over to JavaScript, use the provided functions `alloc` and `dealloc`.
 
 <details>
-    <summary>Here's a real-world example that defines an [H2 histogram](https://h2histogram.org) type whose lifetype is managed by JavaScript.</summary>
+    <summary>Here's a real-world example that defines an <a href='https://h2histogram.org'>H2 histogram</a> type whose lifetime is managed by JavaScript.</summary>
 
 ```rust
 use to_js::{alloc, dealloc};
@@ -134,31 +134,30 @@ On the JavaScript side you can use the following helper function to wrap these m
 function createClass(
   // The object returned by `toJs(instance)`
   rs,
+  // Name prefix, shared by all methods
+  prefix,
   {
-    // Name prefix, shared by all methods (including the constructor)
-    namePrefix,
-    // Name of the constructor (sans prefix)
-    constructorName,
-    // Array of method names (sans prefix)
-    methodNames,
-    // Optional object from method name (sans prefix) to a wrapper function that can transforms the return value of the method.
-    // This is useful for eg. builder build() methods, which can return a pointer to the Rust struct via `alloc`.
-    // To use the pointer you can create a class for the built type whose constructor is `(ptr) => ptr`.
-    methodTransforms
+    // Optional constructor function to override the default of `rs[prefix + 'alloc']`
+    alloc,
+    // Array of method names (sans prefix).
+    names,
+    // Optional object from method name (sans prefix) to wrapper function that can transform the return value of the method.
+    transforms
   }
 ) {
+  // Allow the prefix to end with an underscore or not.
+  if (!prefix.endsWith("_")) prefix += "_";
+
   // Create the constructor function and add method definitions to its prototype
-  const constructor = rs[namePrefix + constructorName];
   const Class = function (...args) {
-    this.ptr = constructor(...args);
+    this.ptr = (alloc ?? rs[prefix + "alloc"])(...args);
   };
+
   const identity = (x) => x;
-  for (const nameSuffix of methodNames) {
-    const methodName = namePrefix + nameSuffix;
-    const method = rs[methodName];
+  for (const name of names) {
+    const method = rs[prefix + name];
     // Optional method-specific transform applied to the result the Rust call
-    const transform = methodTransforms?.[nameSuffix] ?? identity;
-    const name = method.name.slice(namePrefix.length);
+    const transform = transforms?.[name] ?? identity;
     Class.prototype[name] = function (...args) {
       return transform(method(this.ptr, ...args));
     };
@@ -167,14 +166,10 @@ function createClass(
 }
 ```
 
-This function can be used like so to define an `H2` class and use it:
+This function can be used to define an `H2` class and use it:
 
 ```js
-const H2 = createClass(rs, {
-  namePrefix: "h2_",
-  constructorName: "alloc",
-  methodNames: ["encode", "decode", "dealloc"],
-})
+const H2 = createClass(rs, "h2", { names: ["encode", "decode", "dealloc"] })
 
 const hist = new H2(1, 8);      // Construct a Rust-side H2 struct
 const value = hist.encode(123); // Use it
