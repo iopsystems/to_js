@@ -62,7 +62,7 @@ rs.vec_result(500) // => Error: I can't count that high.
 
 ## Memory management
 
-Returning owned values is accomplished by `stash`ing them temporarily, which ensures the value lives until the next FFI call from JS to a Rust function.
+Returning owned values is accomplished by `stash`ing them, which ensures the value lives until the next FFI call from JS to a Rust function.
 
 ```rust
 use to_js::{stash, Stash};
@@ -236,7 +236,7 @@ fn i8_octet() -> I8Octet {
 }
 
 #[js]
-fn quartet() -> U16Quartet {
+fn u16_quartet() -> U16Quartet {
     U16Quartet([1, 2, 3, 4])
 }
 
@@ -288,7 +288,9 @@ fn dynamic_object(x: u32) -> Dynamic {
 
 `Dynamic` values can be arbitrarily nested, which opens up opportunities for rapid prototyping and elegant API design. On the other hand, static return types are more efficient, so you might prefer to use non-dynamic return types for the performance-sensitive parts of your API surface.
 
-As another option, enabling the `json` feature allows you to use dtolnay's [miniserde](https://github.com/dtolnay/miniserde) to encode arbitrary types that are serialized as JSON across the language boundary.
+## Serializing as JSON
+
+Another option for flexible high-level but slower data exchange is to serialize your data as JSON, which can be done by enabling the `json` crate feature. This allows you to use dtolnay's [miniserde](https://github.com/dtolnay/miniserde) to encode arbitrary types that are serialized as JSON across the language boundary.
 
 You can enable the feature by adding `features = ["json"]` to your `to_js` dependency in `Cargo.toml`.
 
@@ -297,14 +299,14 @@ use miniserde::Serialize;
 use to_js::{json, Json};
 
 #[derive(Serialize)]
-struct TestJson {
+struct TestStruct {
     x: u32,
     y: String,
 }
 
 #[js]
 fn test_json() -> Json {
-    json(TestJson {
+    json(TestStruct {
         x: 123,
         y: "456!".to_string(),
     })
