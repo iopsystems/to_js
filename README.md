@@ -181,13 +181,41 @@ hist.dealloc();                 // Deallocate it when finished
 
 </details>
 
+This library encodes all returned values into 64 bits with type information passed through a side channel. A nice consequence is that it can efficiently return small fixed-size ("packed") arrays without extra allocation, so long as they fit into 64 bits. Packed arrays will be returned as the appropriate type of typed array, reusing the same typed array object between calls.
+
+The packed array types are `U8Octet`, `I8Octet`, `U16Quartet`, `I16Quartet`, `U32Pair`, `I32Pair`, and `F32Pair`.
+
+```rs
+use to_js::{U8Octet, I8Octet, U16Quartet, F32Pair};
+
+#[js]
+fn octet() -> U8Octet {
+    U8Octet([1, 2, 3, 4, 5, 6, 7, 8])
+}
+
+#[js]
+fn i8_octet() -> I8Octet {
+    I8Octet([-1, -2, -3, -4, 5, 6, 7, 8])
+}
+
+#[js]
+fn quartet() -> U16Quartet {
+    U16Quartet([1, 2, 3, 4])
+}
+
+#[js]
+fn f32_pair() -> F32Pair {
+    F32Pair([1.0, 2.0])
+}
+```
+
 ## Usage
 
 ```js
 // Given a WebAssembly instance, return an object containing its #[js] exports.
 // If the optional second argument is true, typed arrays (including ones that
-// were stashed) will be copied out of WebAssembly memory before being returned,
-// enhancing ease-of-use at the cost of extra data copies.
+// were stashed or returned as "packed" arrays) will be copied out of WebAssembly
+// memory before being returned, enhancing ease-of-use at the cost of extra data copies.
 function toJs(instance, alwaysCopyData) {
   const view = new DataView(instance.exports.memory.buffer);
   const ptr = view.getUint32(instance.exports.JS, true);
