@@ -161,27 +161,27 @@ fn h2_dealloc(ptr: *mut H2) -> () {
 }
 ```
 
-On the JavaScript side you can use the following helper function to wrap these methods in the JavaScript class.
+On the JavaScript side you can use the following helper function to construct a JavaScript constructor function that uses these methods.
 
 ```js
 // Convenience method to generate a JavaScript-side class that corresponds to a Rust-side struct.
 function createClass(
-  // The object returned by `toJs(instance)`
+  // The WebAssembly instance wrapper returned by `toJs(instance)`
   rs,
-  // Name prefix, shared by all methods, without trailing underscore
+  // Name prefix shared by all methods, without a trailing underscore
   prefix,
   {
     // Optional constructor function to override the default of `rs[prefix + 'alloc']`
     alloc,
-    // Array of method names (sans prefix).
+    // Array of method names.
     names,
-    // Optional object from method name (sans prefix) to wrapper function that can transform the return value of the method.
+    // Optional object from method name to wrapper function that can transform the return value of the method.
     transforms
   }
 ) {
   prefix += "_";
 
-  // Ensure that "dealloc" is listed as a method name
+  // Ensure that "dealloc" is a method on the class
   if (!names.includes("dealloc")) names.push("dealloc");
 
   // Create the constructor function and add method definitions to its prototype
@@ -192,7 +192,6 @@ function createClass(
   const identity = (x) => x;
   for (const name of names) {
     const method = rs[prefix + name];
-    // Optional method-specific transform applied to the result the Rust call
     const transform = transforms?.[name] ?? identity;
     Class.prototype[name] = function (...args) {
       return transform(method(this.ptr, ...args));
@@ -202,7 +201,7 @@ function createClass(
 }
 ```
 
-This function can be used to define an `H2` class and use it:
+This function can be used to define `H2` and use it:
 
 ```js
 const H2 = createClass(rs, "h2", { names: ["encode", "decode"] })
