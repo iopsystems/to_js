@@ -6,8 +6,10 @@ use miniserde::{json, Serialize};
 // Represents a value to be serialized to JSON using miniserde.
 pub struct Json(String);
 
-pub fn json(x: impl Serialize) -> Json {
-    Json(json::to_string(&x))
+impl Json {
+    pub fn new(x: impl Serialize) -> Json {
+        Json(json::to_string(&x))
+    }
 }
 
 // ToWasm impl

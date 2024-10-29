@@ -62,19 +62,19 @@ rs.vec_result(500) // => Error: I can't count that high.
 
 ## Memory management
 
-Returning owned values is accomplished by `stash`ing them, which ensures the value lives until the next FFI call from JS to a Rust function.
+Returning owned values is accomplished by putting them in a `Stash`, which ensures the value lives until the next FFI call from JS to a Rust function.
 
 ```rust
-use to_js::{stash, Stash};
+use to_js::{Stash};
 
 #[js]
 fn string() -> Stash<String> {
-    stash("Hello from a String".to_string())
+    Stash::new("Hello from a String".to_string())
 }
 
 #[js]
 fn count_vec(count_up_to: usize) -> Stash<Vec<usize>> {
-    stash((1..=count_up_to).collect::<Vec<_>>())
+    Stash::new((1..=count_up_to).collect::<Vec<_>>())
 }
 
 #[js]
@@ -267,7 +267,7 @@ You can can return dynamic arrays, which are represented on the other side of th
 ```rust
 #[js]
 fn dynamic_array() -> Stash<Box<[Dynamic]>> {
-    stash(
+    Stash::new(
         [
             Dynamic::new("hi"),
             Dynamic::new(Some(123.0)),
@@ -295,7 +295,7 @@ You can enable the feature by adding `features = ["json"]` to your `to_js` depen
 
 ```rust
 use miniserde::Serialize;
-use to_js::{json, Json};
+use to_js::{Json};
 
 #[derive(Serialize)]
 struct TestStruct {
@@ -305,7 +305,7 @@ struct TestStruct {
 
 #[js]
 fn test_json() -> Json {
-    json(TestStruct {
+    Json::new(TestStruct {
         x: 123,
         y: "456!".to_string(),
     })

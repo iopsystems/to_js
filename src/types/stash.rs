@@ -10,18 +10,20 @@ static STASH: RwLock<Vec<Box<dyn Send + Sync + 'static>>> = RwLock::new(Vec::new
 
 pub struct Stash<T>(Wasm, PhantomData<T>);
 
-// `stash` eagerly writes the wasm representation of `x` into STASH.
-// We do this here rather than in Stash::to_wasm since it allows us
+// This constructor eagerly writes the wasm representation of `x` into STASH.
+// We do this here rather than in Stash::to_wasm since it allows Stash
 // to implement ToWasm, which does not require ownership, but
-// is semantically valid to do while STASH owns the value.
-pub fn stash<T>(x: T) -> Stash<T>
+// is a semantically valid operation while STASH owns the value.
+impl<T> Stash<T>
 where
     T: Send + Sync + 'static,
     for<'a> &'a T: IntoWasm,
 {
-    let wasm = (&x).into_wasm();
-    STASH.write().unwrap().push(Box::new(x));
-    return Stash(wasm, PhantomData);
+    pub fn new(x: T) -> Stash<T> {
+        let wasm = (&x).into_wasm();
+        STASH.write().unwrap().push(Box::new(x));
+        return Stash(wasm, PhantomData);
+    }
 }
 
 pub fn clear_stash() {
