@@ -1,14 +1,14 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform};
 use crate::{ToWasm, Wasm};
-use miniserde::{json, Serialize};
 
 // Represents a value to be serialized to JSON using miniserde.
 pub struct Json(String);
 
 impl Json {
-    pub fn new(x: impl Serialize) -> Json {
-        Json(json::to_string(&x))
+    pub fn new(x: impl serde::Serialize) -> Json {
+        // todo: handle this error -- understand when it might happen first...
+        Json(serde_json::to_string(&x).unwrap())
     }
 }
 

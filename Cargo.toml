@@ -17,10 +17,11 @@ debug-assertions = true
 
 [dependencies]
 js_proc_macro = { path = "./js_proc_macro" }
-miniserde = "0.1" # hopefully i do not regret this. we can always make it a feature...
+serde = { version = "1.0", optional = true }
+serde_json = { version = "1.0", optional = true }
 
 [features]
 default = ["proc-macro"]
 proc-macro = []
-json = []
+json = ["dep:serde", "dep:serde_json"]
 
