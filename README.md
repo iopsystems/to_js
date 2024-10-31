@@ -156,7 +156,7 @@ fn h2_decode(x: &H2, code: u32) -> U32Pair {
 }
 
 #[js]
-fn h2_dealloc(ptr: *mut H2) -> () {
+fn h2_dealloc(ptr: *mut H2) {
     dealloc(ptr);
 }
 ```
@@ -167,14 +167,14 @@ On the JavaScript side you can use the following helper function to construct a 
 // Convenience method to generate a JavaScript-side class that corresponds to a Rust-side struct.
 function createClass(
   // The WebAssembly instance wrapper returned by `toJs(instance)`
-  rs,
+  instance,
   // Name prefix shared by all methods, without a trailing underscore
   prefix,
   {
-    // Optional constructor function to override the default of `rs[prefix + 'alloc']`
+    // Optional constructor function to override the default of `instance[prefix + 'alloc']`
     alloc,
     // Array of method names.
-    names,
+    methods,
     // Optional object from method name to wrapper function that can transform the return value of the method.
     transforms
   }
@@ -182,16 +182,17 @@ function createClass(
   prefix += "_";
 
   // Ensure that "dealloc" is a method on the class
-  if (!names.includes("dealloc")) names.push("dealloc");
+  if (!methods.includes("dealloc")) methods.push("dealloc");
 
   // Create the constructor function and add method definitions to its prototype
   const Class = function (...args) {
-    this.ptr = (alloc ?? rs[prefix + "alloc"])(...args);
+    this.ptr = (alloc ?? instance[prefix + "alloc"])(...args);
   };
 
   const identity = (x) => x;
-  for (const name of names) {
-    const method = rs[prefix + name];
+  
+  for (const name of methods) {
+    const method = instance[prefix + name];
     const transform = transforms?.[name] ?? identity;
     Class.prototype[name] = function (...args) {
       return transform(method(this.ptr, ...args));

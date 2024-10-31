@@ -67,7 +67,7 @@ macro_rules! to_js {
                 use $crate::{IntoWasm, TypeInfo};
 
                 // Define the exported function, which returns an f64-encoded Wasm value
-                #[export_name = concat!(stringify!($name))]
+                #[unsafe(export_name = concat!(stringify!($name)))]
                 pub extern "C" fn call($($arg: $typ),*) -> f64 {
                     $crate::clear_stash();
                     let value = $name($($arg),*);
@@ -75,7 +75,7 @@ macro_rules! to_js {
                 }
 
                 // Define a companion function which returns the info needed to interpret the encoding.
-                #[export_name = concat!(stringify!($name), "_info_")]
+                #[unsafe(export_name = concat!(stringify!($name), "_info_"))]
                 pub extern "C" fn type_info() -> f64 {
                     let info = <$ret as TypeInfo>::type_info();
                     info.into_wasm().value()
