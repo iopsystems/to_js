@@ -29,7 +29,15 @@ impl Parse for JsArgs {
                 let _eq_token: syn::Token![=] = input.parse()?;
                 let value: LitStr = input.parse()?;
                 if ident == "name_prefix" {
-                    name_prefix = Some(value.value());
+                    let mut s = value.value();
+                    if s.ends_with('_') {
+                        return Err(syn::Error::new(
+                            ident.span(),
+                            "name prefix should not include a trailing underscore, as one will be added automatically",
+                        ));
+                    }
+                    s.push('_');
+                    name_prefix = Some(s);
                 }
             }
             if input.peek(syn::Token![,]) {
