@@ -1,14 +1,15 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform};
+use crate::Stash;
 use crate::{ToWasm, Wasm};
 
 // Represents a value to be serialized to JSON using miniserde.
-pub struct Json(String);
+pub struct Json(Stash<String>);
 
 impl Json {
     pub fn new(x: &impl serde::Serialize) -> Json {
-        // todo: handle this error -- understand when it might happen first...
-        Json(serde_json::to_string(x).expect("JSON serialization failed"))
+        let s = serde_json::to_string(x).expect("JSON serialization failed");
+        Json(Stash::new(s))
     }
 }
 

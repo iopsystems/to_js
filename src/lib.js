@@ -148,7 +148,7 @@ return function ${name}(${argsAsString}) {
         throw new Error(\`${name}: expected ${args.length} argument${args.length === 1 ? '' : 's'}, got \${arguments.length}\`);
     }
     let value = exports.${name}(${argsAsString});
-    ${needsPair ? `const pair = u32Pair(value); console.log('pair:', pair);` : ``}
+    ${needsPair ? `const pair = u32Pair(value);` : ``}
     ${isResult ? `tryResult(pair);` : ``}
     ${isOption ? `if (tryOption(pair)) return null;` : ``}
     ${isArray ? `value = new ${arrayTypes[arrayType].name}(exports.memory.buffer, pair[0], pair[1])` : ``}
