@@ -8,7 +8,7 @@ pub struct Json(String);
 impl Json {
     pub fn new(x: &impl serde::Serialize) -> Json {
         // todo: handle this error -- understand when it might happen first...
-        Json(serde_json::to_string(x).unwrap())
+        Json(serde_json::to_string(x).expect("JSON serialization failed"))
     }
 }
 
