@@ -290,12 +290,12 @@ fn dynamic_object(x: u32) -> Dynamic {
 
 ## Serializing as JSON
 
-Another option for flexible high-level but slower data exchange is to serialize your data as JSON, which can be done by enabling the `json` crate feature. This allows you to use dtolnay's [miniserde](https://github.com/dtolnay/miniserde) to encode arbitrary types that are serialized as JSON across the language boundary.
+Another option for flexible high-level but slower data exchange is to serialize your data as JSON, which can be done by enabling the `json` crate feature. This allows you to use [serde](https://github.com/serde-rs/serde) to encode arbitrary types that are serialized as JSON across the language boundary.
 
 You can enable the feature by adding `features = ["json"]` to your `to_js` dependency in `Cargo.toml`.
 
 ```rust
-use miniserde::Serialize;
+use serde::Serialize;
 use to_js::{Json};
 
 #[derive(Serialize)]

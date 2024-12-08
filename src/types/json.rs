@@ -3,7 +3,7 @@ use crate::typeinfo::{ArrayType, Transform};
 use crate::Stash;
 use crate::{ToWasm, Wasm};
 
-// Represents a value to be serialized to JSON using miniserde.
+// Represents a value to be serialized to JSON using serde.
 pub struct Json(Stash<String>);
 
 impl Json {
