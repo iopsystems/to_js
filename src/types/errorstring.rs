@@ -1,4 +1,4 @@
-use crate::types::stash::Stash;
+use crate::types::keepalive::KeepAlive;
 use crate::ToWasm;
 use std::ffi::{CStr, CString};
 
@@ -33,7 +33,7 @@ impl ErrorString for &str {
 impl ErrorString for CString {
     fn to_u32(&self) -> u32 {
         // The Wasm encoding of a CString is a (ptr, len) pair
-        let wasm = Stash::new(self.clone()).to_wasm().value();
+        let wasm = KeepAlive::new(self.clone()).to_wasm().value();
         // Extract and return the ptr, which is stored in the low bits
         wasm.to_bits() as u32
     }

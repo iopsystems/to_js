@@ -46,7 +46,7 @@ impl ToWasm for i64 {
 
 // HasNiche impl
 // (There's no blanket implementation for Number since since not *all* numbers
-//  have niches; in particular, u64 and i64 have no niches available.)
+// have niches; in particular, u64 and i64 have no niches available.)
 
 // TypeInfo impl
 //

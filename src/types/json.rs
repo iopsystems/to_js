@@ -1,15 +1,15 @@
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform};
-use crate::Stash;
+use crate::KeepAlive;
 use crate::{ToWasm, Wasm};
 
 // Represents a value to be serialized to JSON using serde.
-pub struct Json(Stash<String>);
+pub struct Json(KeepAlive<String>);
 
 impl Json {
     pub fn new(x: &impl serde::Serialize) -> Json {
         let s = serde_json::to_string(x).expect("JSON serialization failed");
-        Json(Stash::new(s))
+        Json(KeepAlive::new(s))
     }
 }
 

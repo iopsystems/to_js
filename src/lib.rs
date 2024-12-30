@@ -13,8 +13,8 @@ pub use typeinfo::TypeInfo;
 pub use types::dynamic::Dynamic;
 #[cfg(feature = "json")]
 pub use types::json::Json;
+pub use types::keepalive::{clear_keepalive, KeepAlive};
 pub use types::packed::*;
-pub use types::stash::{clear_stash, Stash};
 
 // Wasm is the central type of this library and represents values that can be returned across the FFI boundary.
 // Individual types that we want to be serializable implement Into<Wasm> via impls of the `From` trait.
@@ -69,7 +69,7 @@ macro_rules! to_js {
                 // Define the exported function, which returns an f64-encoded Wasm value
                 #[unsafe(export_name = concat!(stringify!($name)))]
                 pub extern "C" fn call($($arg: $typ),*) -> f64 {
-                    $crate::clear_stash();
+                    $crate::clear_keepalive();
                     let value = $name($($arg),*);
                     value.into_wasm().value()
                 }

@@ -62,23 +62,23 @@ rs.vec_result(500) // => Error: I can't count that high.
 
 ## Memory management
 
-Returning owned values is accomplished by putting them in a `Stash`, which ensures the value lives until the next FFI call from JS to a Rust function.
+Returning owned values is accomplished by wrapping them in `KeepAlive`, which ensures the value lives until the next FFI call from JS to a Rust function.
 
 ```rust
-use to_js::{Stash};
+use to_js::{KeepAlive};
 
 #[js]
-fn string() -> Stash<String> {
-    Stash::new("Hello from a String".to_string())
+fn string() -> KeepAlive<String> {
+    KeepAlive::new("Hello from a String".to_string())
 }
 
 #[js]
-fn count_vec(count_up_to: usize) -> Stash<Vec<usize>> {
-    Stash::new((1..=count_up_to).collect::<Vec<_>>())
+fn count_vec(count_up_to: usize) -> KeepAlive<Vec<usize>> {
+    KeepAlive::new((1..=count_up_to).collect::<Vec<_>>())
 }
 
 #[js]
-fn count_vec_result(count_up_to: usize) -> Result<Stash<Vec<usize>>, &'static str> {
+fn count_vec_result(count_up_to: usize) -> Result<KeepAlive<Vec<usize>>, &'static str> {
     if count_up_to > 100 {
         return Err("I can't count that high.");
     }
@@ -267,8 +267,8 @@ You can can return dynamic arrays, which are represented on the other side of th
 
 ```rust
 #[js]
-fn dynamic_array() -> Stash<Box<[Dynamic]>> {
-    Stash::new(
+fn dynamic_array() -> KeepAlive<Box<[Dynamic]>> {
+    KeepAlive::new(
         [
             Dynamic::new("hi"),
             Dynamic::new(Some(123.0)),
