@@ -165,7 +165,6 @@ On the JavaScript side you can use the following helper function to construct a 
 
 ```js
 // Convenience method to generate a JavaScript-side class that corresponds to a Rust-side struct.
-// Convenience method to generate a JavaScript-side class that corresponds to a Rust-side struct.
 function createClass(
   // The WebAssembly instance wrapper returned by `toJs(instance)`
   instance,
