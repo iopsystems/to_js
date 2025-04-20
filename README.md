@@ -211,7 +211,7 @@ function createClass(
 This function can be used to define `H2` and use it:
 
 ```js
-const H2 = createClass(rs, "h2", { names: ["encode", "decode"] })
+const H2 = createClass(rs, "h2", { methods: ["encode", "decode"] })
 
 const hist = new H2(1, 8);      // Construct a Rust-side H2 histogram struct
 const value = hist.encode(123); // Use it
