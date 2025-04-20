@@ -165,20 +165,25 @@ On the JavaScript side you can use the following helper function to construct a 
 
 ```js
 // Convenience method to generate a JavaScript-side class that corresponds to a Rust-side struct.
+// Convenience method to generate a JavaScript-side class that corresponds to a Rust-side struct.
 function createClass(
   // The WebAssembly instance wrapper returned by `toJs(instance)`
   instance,
   // Name prefix shared by all methods, without a trailing underscore
   prefix,
   {
+    // Array of method names
+    methods,
     // Optional constructor function to override the default of `instance[prefix + 'alloc']`
     alloc,
-    // Array of method names.
-    methods,
     // Optional object from method name to wrapper function that can transform the return value of the method.
-    transforms
-  }
+    transforms,
+  },
 ) {
+  if (prefix.endsWith("_"))
+    throw new Error(
+      "name prefix should not include a trailing underscore, as one will be added automatically",
+    );
   prefix += "_";
 
   // Ensure that "dealloc" is a method on the class
@@ -190,15 +195,17 @@ function createClass(
   };
 
   const identity = (x) => x;
-  
+
   for (const name of methods) {
     const method = instance[prefix + name];
+    if (method === undefined)
+      throw new Error("undefined method: " + (prefix + name));
     const transform = transforms?.[name] ?? identity;
     Class.prototype[name] = function (...args) {
       return transform(method(this.ptr, ...args));
     };
   }
-  return Class;
+  return Class
 }
 ```
 
