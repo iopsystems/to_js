@@ -55,7 +55,7 @@ impl<T: ToWasm> IntoWasm for T {
 /// since we use that macro capture ($ret) to figure out the TypeInfo for each function the user wants to export.
 #[macro_export]
 macro_rules! to_js {
-    ($( $(#[$meta:meta])* $vis:vis fn $name:ident($($arg:ident : $typ:ty$(,)?)*) -> $ret:ty $body:block )*) => {
+    ($( $(#[$meta:meta])* $vis:vis const? fn $name:ident($($arg:ident : $typ:ty$(,)?)*) -> $ret:ty $body:block )*) => {
         $(
             // Define the original function
             $(#[$meta])*
