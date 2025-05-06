@@ -171,14 +171,18 @@ function createClass(
   // Name prefix shared by all methods, without a trailing underscore
   prefix,
   {
+    // Array of method names
+    methods,
     // Optional constructor function to override the default of `instance[prefix + 'alloc']`
     alloc,
-    // Array of method names.
-    methods,
     // Optional object from method name to wrapper function that can transform the return value of the method.
-    transforms
-  }
+    transforms,
+  },
 ) {
+  if (prefix.endsWith("_"))
+    throw new Error(
+      "name prefix should not include a trailing underscore, as one will be added automatically",
+    );
   prefix += "_";
 
   // Ensure that "dealloc" is a method on the class
@@ -190,22 +194,24 @@ function createClass(
   };
 
   const identity = (x) => x;
-  
+
   for (const name of methods) {
     const method = instance[prefix + name];
+    if (method === undefined)
+      throw new Error("undefined method: " + (prefix + name));
     const transform = transforms?.[name] ?? identity;
     Class.prototype[name] = function (...args) {
       return transform(method(this.ptr, ...args));
     };
   }
-  return Class;
+  return Class
 }
 ```
 
 This function can be used to define `H2` and use it:
 
 ```js
-const H2 = createClass(rs, "h2", { names: ["encode", "decode"] })
+const H2 = createClass(rs, "h2", { methods: ["encode", "decode"] })
 
 const hist = new H2(1, 8);      // Construct a Rust-side H2 histogram struct
 const value = hist.encode(123); // Use it
