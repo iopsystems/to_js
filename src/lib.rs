@@ -55,11 +55,11 @@ impl<T: ToWasm> IntoWasm for T {
 /// since we use that macro capture ($ret) to figure out the TypeInfo for each function the user wants to export.
 #[macro_export]
 macro_rules! to_js {
-    ($( $(#[$meta:meta])* $vis:vis $(const)? fn $name:ident($($arg:ident : $typ:ty$(,)?)*) -> $ret:ty $body:block )*) => {
+    ($( $(#[$meta:meta])* $vis:vis $($const:ident)? fn $name:ident($($arg:ident : $typ:ty$(,)?)*) -> $ret:ty $body:block )*) => {
         $(
             // Define the original function
             $(#[$meta])*
-            $vis fn $name($($arg: $typ),*) -> $ret $body
+            $vis fn $const $name($($arg: $typ),*) -> $ret $body
 
             // Define exported functions, using a const block in order to allow repetition of the Rust-side
             // function names (call and info) if multiple functions are exported in the same outer scope.
