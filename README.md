@@ -252,53 +252,11 @@ fn f32_pair() -> F32Pair {
 }
 ```
 
-## Dynamic return types
-
-As an experimental feature you can return dynamically-typed values using the `Dynamic` type:
-
-```rust
-use to_js::Dynamic;
-
-#[js]
-fn string_or_int(x: u32) -> Result<Dynamic, &'static str> {
-    match x {
-        0..10 => Ok(Dynamic::new("hi from a String".to_string())),
-        10..100 => Ok(Dynamic::new(123)),
-        _ => Err("no dynamic for you!"),
-    }
-}
-```
-
-You can can return dynamic arrays, which are represented on the other side of the FFI boundary as plain [JavaScript arrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array):
-
-```rust
-#[js]
-fn dynamic_array() -> KeepAlive<Box<[Dynamic]>> {
-    KeepAlive::new(
-        [
-            Dynamic::new("hi"),
-            Dynamic::new(Some(123.0)),
-            Dynamic::new::<Option<&'static str>>(None),
-        ].into()
-    )
-}
-```
-
-And you can return dynamic objects, which are represented on the other side of the FFI boundary as [JavaScript objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object):
-
-```rust
-fn dynamic_object(x: u32) -> Dynamic {
-    vec![("key", Dynamic::new("value"))].into_boxed_slice().into()
-}
-```
-
-`Dynamic` values can be arbitrarily nested, which opens up opportunities for rapid prototyping and elegant API design. On the other hand, static return types are more efficient, so you might prefer to use non-dynamic return types for the performance-sensitive parts of your API surface.
-
 ## Serializing as JSON
 
-Another option for flexible high-level data exchange is to serialize your data as JSON, which can be done by enabling the `json` crate feature. This allows you to use [serde](https://github.com/serde-rs/serde) to encode arbitrary types that are serialized as JSON across the language boundary.
+For flexible high-level data exchange you can serialize your data as JSON, which uses [serde](https://serde.rs/) and requires the `json` crate feature.
 
-You can enable the feature by adding `features = ["json"]` to your `to_js` dependency in `Cargo.toml`.
+You can enable this feature by adding `features = ["json"]` to your `to_js` dependency in `Cargo.toml`.
 
 ```rust
 use serde::Serialize;

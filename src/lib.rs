@@ -10,7 +10,6 @@ mod niche;
 mod types;
 
 pub use typeinfo::TypeInfo;
-pub use types::dynamic::Dynamic;
 #[cfg(feature = "json")]
 pub use types::json::Json;
 pub use types::keepalive::{clear_keepalive, KeepAlive};

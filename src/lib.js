@@ -49,9 +49,6 @@ export default function toJs(instance, alwaysCopyData) {
         (x) => {},
         Boolean,
         (x) => textDecoder.decode(x),
-        dynamic,
-        dynamicArray,
-        dynamicObject,
         (x) => JSON.parse(textDecoder.decode(x)),
     ];
 
@@ -93,38 +90,6 @@ export default function toJs(instance, alwaysCopyData) {
 
     function tryResult(isArray) {
         return isArray ? tryResultLowBitsOne : tryResultHighBitsNaN;
-    }
-
-    // Infer the appropriate type dynamically so the type can differ by call (for Dynamic)
-    function dynamic([value, typeInfo]) {
-        const [isResult, isOption, isArray, arrayType, transformIndex] = u8Octet(typeInfo);
-        const isPackedArray = transformIndex < 7;
-        const isIdentityTransform = transformIndex === 9;
-        const slice = alwaysCopyData && (isPackedArray || (isArray && isIdentityTransform));
-        const pair = u32Pair(value);
-        if (isResult) tryResult(isArray)(pair);
-        if (isOption && tryOption(isArray)(pair)) return null;
-        if (isArray) value = new arrayTypes[arrayType](instanceExports.memory.buffer, pair[0], pair[1]);
-        const transform = outputTransforms[transformIndex];
-        const ret = transform(value);
-        return slice ? ret.slice() : ret;
-    }
-
-    function dynamicArray(x) {
-        const ret = [];
-        for (let i = 0; i < x.length; i += 2) {
-            ret.push(dynamic(x.slice(i, i + 2)));
-        }
-        return ret;
-    }
-
-    function dynamicObject(x) {
-        const arr = dynamicArray(x);
-        const ret = {};
-        for (let i = 0; i < arr.length; i += 2) {
-            ret[arr[i]] = arr[i + 1];
-        }
-        return ret;
     }
 
     return Object.fromEntries(

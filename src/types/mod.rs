@@ -1,5 +1,4 @@
 mod bool;
-pub(crate) mod dynamic;
 mod errorstring;
 pub(crate) mod json;
 pub(crate) mod keepalive;

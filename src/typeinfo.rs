@@ -42,9 +42,6 @@ pub enum Transform {
     Void,
     Bool,
     String,
-    Dynamic,
-    DynamicArray,
-    DynamicObject,
     Json,
 }
 
