@@ -1,3 +1,5 @@
+#![cfg(feature = "json")]
+
 use crate::niche::{HasNiche, Niche};
 use crate::typeinfo::{ArrayType, Transform};
 use crate::KeepAlive;
