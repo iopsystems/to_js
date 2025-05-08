@@ -35,7 +35,7 @@ fn slice() -> &'static [u32] {
 // If the optional second argument is true, typed arrays (including ones that
 // were stashed or returned as packed arrays) will be copied out of WebAssembly
 // memory before being returned, enhancing ease-of-use at the cost of extra data copies.
-function toJs(instance, alwaysCopyData) {
+function toJs(instance, alwaysCopyData = false) {
   const view = new DataView(instance.exports.memory.buffer);
   const ptr = view.getUint32(instance.exports.JS, true);
   const len = view.getUint32(instance.exports.JS + 4, true);
