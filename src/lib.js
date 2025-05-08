@@ -1,5 +1,5 @@
 export default function toJs(instance, alwaysCopyData) {
-    // In enum variant order (ArrayType)
+    // In enum variant order (enum: ArrayType)
     const arrayTypes = [
         Uint8Array,
         Int8Array,
@@ -34,7 +34,7 @@ export default function toJs(instance, alwaysCopyData) {
     const textDecoder = new TextDecoder();
     const instanceExports = instance.exports;
 
-    // In enum variant order (Transform)
+    // In enum variant order (enum: Transform)
     const outputTransforms = [
         u8Octet,
         i8Octet,
@@ -66,7 +66,7 @@ export default function toJs(instance, alwaysCopyData) {
     }
 
     // Implement decoding for both niche strategies
-
+    
     function tryResultHighBitsNaN(pair) {
         if (pair[0] !== 1 && pair[1] === 0xfff80000) {
             throwError(pair[0]);
@@ -95,6 +95,7 @@ export default function toJs(instance, alwaysCopyData) {
         return isArray ? tryResultLowBitsOne : tryResultHighBitsNaN;
     }
 
+    // Infer the appropriate type dynamically so the type can differ by call (for Dynamic)
     function dynamic([value, typeInfo]) {
         const [isResult, isOption, isArray, arrayType, transformIndex] = u8Octet(typeInfo);
         const isPackedArray = transformIndex < 7;
