@@ -108,6 +108,8 @@ pub fn dealloc<T>(ptr: *mut T) -> Box<T> {
 /// Note: We currently embed unminified JavaScript. With basic zip compression, the difference in .wasm.zip size
 /// is a little over half a kilobyte between the unminified code and a version minified using esbuild:
 /// https://esbuild.github.io/try/#dAAwLjIzLjAALS1taW5pZnkA. (October 27, 2024.)
+/// Note: The JS code currently includes many comments, which take up space in the resulting bundle.
+/// Maybe one day Rust will allow removing comments in a static context.
 #[used]
 #[export_name = "JS"]
 pub static JS: &[u8] = &include_bytes!("./lib.js").as_slice();
