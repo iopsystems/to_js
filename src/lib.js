@@ -146,7 +146,7 @@ export function createClass(
 	// Name prefix shared by all methods, separated from method names by an underscore
 	prefix,
 	{
-		// Array of method names
+		// Optional array of method names. Will be inferred from the prefix if not provided.
 		methods,
 		// Optional Object from method name to wrapper function that can transform the return value of a method.
 		transforms
@@ -171,7 +171,7 @@ export function createClass(
 	if (methods === undefined) {
 		methods = [];
 		for (const name in instance) {
-			if (name.startsWith(prefix)) {
+			if (name.startsWith(prefix) && name !== allocMethod) {
 				methods.push(name.slice(prefix.length));
 			}
 		}

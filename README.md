@@ -35,14 +35,16 @@ fn slice() -> &'static [u32] {
 // If the optional second argument is true, typed arrays (including ones that
 // were stashed or returned as packed arrays) will be copied out of WebAssembly
 // memory before being returned, enhancing ease-of-use at the cost of extra data copies.
-function toJs(instance, alwaysCopyData = false) {
+async function toJs(instance, alwaysCopyData = false) {
   const view = new DataView(instance.exports.memory.buffer);
   const ptr = view.getUint32(instance.exports.JS, true);
   const len = view.getUint32(instance.exports.JS + 4, true);
   const code = new TextDecoder().decode(view.buffer.slice(ptr, ptr + len));
-  return import(encodeURI("data:text/javascript," + code)).then((module) =>
-    module.default(instance, alwaysCopyData)
-  );
+  const blob = new Blob([code], { type: 'text/javascript' });
+  const url = URL.createObjectURL(blob);
+  const util = await import(url);
+  URL.revokeObjectURL(url);
+  return Object.assign(util.wrapInstance(instance, alwaysCopyData), { util });
 }
 
 const rs = await WebAssembly.instantiateStreaming(
@@ -161,63 +163,35 @@ fn h2_dealloc(ptr: *mut H2) {
 }
 ```
 
-On the JavaScript side you can use the following helper function to construct a JavaScript constructor function that uses these methods.
-
-```js
-// Convenience method to generate a JavaScript-side class that corresponds to a Rust-side struct.
-function createClass(
-  // The WebAssembly instance wrapper returned by `toJs(instance)`
-  instance,
-  // Name prefix shared by all methods, without a trailing underscore
-  prefix,
-  {
-    // Array of method names
-    methods,
-    // Optional constructor function to override the default of `instance[prefix + 'alloc']`
-    alloc,
-    // Optional object from method name to wrapper function that can transform the return value of the method.
-    transforms,
-  },
-) {
-  if (prefix.endsWith("_"))
-    throw new Error(
-      "name prefix should not include a trailing underscore, as one will be added automatically",
-    );
-  prefix += "_";
-
-  // Ensure that "dealloc" is a method on the class
-  if (!methods.includes("dealloc")) methods.push("dealloc");
-
-  // Create the constructor function and add method definitions to its prototype
-  const Class = function (...args) {
-    this.ptr = (alloc ?? instance[prefix + "alloc"])(...args);
-  };
-
-  const identity = (x) => x;
-
-  for (const name of methods) {
-    const method = instance[prefix + name];
-    if (method === undefined)
-      throw new Error("undefined method: " + (prefix + name));
-    const transform = transforms?.[name] ?? identity;
-    Class.prototype[name] = function (...args) {
-      return transform(method(this.ptr, ...args));
-    };
-  }
-  return Class
-}
-```
+On the JavaScript side you can use an included helper function to construct a JavaScript constructor function that uses these methods.
 
 This function can be used to define `H2` and use it:
 
 ```js
-const H2 = createClass(rs, "h2", { methods: ["encode", "decode"] })
+const H2 = rs.util.createClass(rs, "h2")
 
 const hist = new H2(1, 8);      // Construct a Rust-side H2 histogram struct
 const value = hist.encode(123); // Use it
 hist.dealloc();                 // Deallocate it when finished
 ```
 
+The full signature of this utility method is:
+
+```js
+// Create a JavaScript-side class that corresponds to a Rust-side struct.
+export function createClass(
+    // A WebAssembly instance wrapper returned by `wrapInstance(instance)`
+    instance,
+    // Name prefix shared by all methods, separated from method names by an underscore
+    prefix,
+    {
+        // Optional array of method names. Will be inferred from the prefix if not provided.
+        methods,
+        // Optional Object from method name to wrapper function that can transform the return value of a method.
+        transforms
+    } = {}
+) { ... }
+```
 </details>
 
 ## Packed arrays
