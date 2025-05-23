@@ -42,9 +42,9 @@ async function toJs(instance, alwaysCopyData = false) {
   const code = new TextDecoder().decode(view.buffer.slice(ptr, ptr + len));
   const blob = new Blob([code], { type: 'text/javascript' });
   const url = URL.createObjectURL(blob);
-  const util = await import(url);
+  const mod = await import(url);
   URL.revokeObjectURL(url);
-  return Object.assign(util.wrapInstance(instance, alwaysCopyData), { util });
+  return Object.assign(mod.wrap(instance, alwaysCopyData), { mod });
 }
 
 const rs = await WebAssembly.instantiateStreaming(
@@ -168,7 +168,7 @@ On the JavaScript side you can use an included helper function to construct a Ja
 This function can be used to define `H2` and use it:
 
 ```js
-const H2 = rs.util.createClass(rs, "h2")
+const H2 = rs.mod.createClass(rs, "h2")
 
 const hist = new H2(1, 8);      // Construct a Rust-side H2 histogram struct
 const value = hist.encode(123); // Use it
@@ -180,7 +180,7 @@ The full signature of this utility method is:
 ```js
 // Create a JavaScript-side class that corresponds to a Rust-side struct.
 export function createClass(
-    // A WebAssembly instance wrapper returned by `wrapInstance(instance)`
+    // A WebAssembly instance wrapper returned by `wrap(instance)`
     instance,
     // Name prefix shared by all methods, separated from method names by an underscore
     prefix,

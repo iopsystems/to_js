@@ -2,7 +2,7 @@
 // If the optional second argument is true, typed arrays (including ones that
 // were stashed or returned as packed arrays) will always be copied out of the
 // WebAssembly heap before being returned.
-export function wrapInstance(instance, alwaysCopyData) {
+export function wrap(instance, alwaysCopyData) {
 	// In enum variant order (enum: ArrayType)
 	const arrayTypes = [
 		Uint8Array,
@@ -141,7 +141,7 @@ export function wrapInstance(instance, alwaysCopyData) {
 
 // Create a JavaScript-side class that corresponds to a Rust-side struct.
 export function createClass(
-	// A WebAssembly instance wrapper returned by `wrapInstance(instance)`
+	// A WebAssembly instance wrapper returned by `wrap(instance)`
 	instance,
 	// Name prefix shared by all methods, separated from method names by an underscore
 	prefix,
