@@ -69,7 +69,7 @@ export function wrap(instance, alwaysCopyData) {
 	// Implement decoding for both niche strategies
 	
 	function tryResultHighBitsNaN(pair) {
-		if (pair[0] !== 1 && pair[1] === 0xfff80000) {
+		if (pair[0] !== 0 && pair[1] === 0xfff80000) {
 			throwError(pair[0]);
 		}
 	}
