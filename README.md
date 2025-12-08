@@ -33,7 +33,7 @@ fn slice() -> &'static [u32] {
 ```js
 // Given a WebAssembly instance, return an object containing its #[js] exports.
 // If the optional second argument is true, typed arrays (including ones that
-// were stashed or returned as packed arrays) will be copied out of WebAssembly
+// were kept alive or returned as packed arrays) will be copied out of WebAssembly
 // memory before being returned, enhancing ease-of-use at the cost of extra data copies.
 async function toJs(instance, alwaysCopyData = false) {
   const view = new DataView(instance.exports.memory.buffer);
