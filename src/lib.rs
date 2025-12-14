@@ -14,6 +14,8 @@ pub use typeinfo::TypeInfo;
 pub use types::json::Json;
 pub use types::keepalive::{clear_keepalive, KeepAlive};
 pub use types::packed::*;
+#[cfg(feature = "reference-types")]
+pub use types::externref::JsValue;
 
 // Wasm is the central type of this library and represents values that can be returned across the FFI boundary.
 // Individual types that we want to be serializable implement Into<Wasm> via impls of the `From` trait.

@@ -24,4 +24,5 @@ serde_json = { version = "1.0", optional = true }
 default = ["proc-macro"]
 proc-macro = []
 json = ["dep:serde", "dep:serde_json"]
+reference-types = []
 

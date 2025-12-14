@@ -252,3 +252,110 @@ fn test_json() -> Json {
 ```
 
 Calling this function from JavaScript will return a JavaScript object: `{ x: 123, y: "456!" }`.
+
+## Working with JavaScript objects (Reference Types)
+
+The `reference-types` feature enables Rust code to hold references to JavaScript objects and call methods on them. Objects are stored in a JavaScript-side table, and Rust holds indices into that table.
+
+Enable the feature in your `Cargo.toml`:
+
+```toml
+to_js = { version = "0.1", features = ["reference-types"] }
+```
+
+### JavaScript Setup
+
+When using reference types, you must provide additional imports when instantiating the WebAssembly module:
+
+```js
+let memory; // Will be set after instantiation
+const jsRefs = [null]; // Index 0 = null, objects start at index 1
+
+const decode = (ptr, len) => new TextDecoder().decode(
+    new Uint8Array(memory.buffer, ptr, len)
+);
+
+const jsImports = {
+    __js: {
+        // Core
+        global_this: () => { jsRefs.push(globalThis); return jsRefs.length - 1; },
+        release: (idx) => { jsRefs[idx] = null; },
+
+        // Property access
+        get: (idx, p, l) => { const v = jsRefs[idx][decode(p, l)]; jsRefs.push(v); return jsRefs.length - 1; },
+        set: (idx, p, l, val) => { jsRefs[idx][decode(p, l)] = jsRefs[val]; },
+
+        // Conversions: primitives → JsValue index
+        from_f64: (n) => { jsRefs.push(n); return jsRefs.length - 1; },
+        from_str: (p, l) => { jsRefs.push(decode(p, l)); return jsRefs.length - 1; },
+
+        // Function calls (0-5 args)
+        call_0: (f) => { const r = jsRefs[f](); jsRefs.push(r); return jsRefs.length - 1; },
+        call_1: (f, a) => { const r = jsRefs[f](jsRefs[a]); jsRefs.push(r); return jsRefs.length - 1; },
+        call_2: (f, a, b) => { const r = jsRefs[f](jsRefs[a], jsRefs[b]); jsRefs.push(r); return jsRefs.length - 1; },
+        call_3: (f, a, b, c) => { const r = jsRefs[f](jsRefs[a], jsRefs[b], jsRefs[c]); jsRefs.push(r); return jsRefs.length - 1; },
+        call_4: (f, a, b, c, d) => { const r = jsRefs[f](jsRefs[a], jsRefs[b], jsRefs[c], jsRefs[d]); jsRefs.push(r); return jsRefs.length - 1; },
+        call_5: (f, a, b, c, d, e) => { const r = jsRefs[f](jsRefs[a], jsRefs[b], jsRefs[c], jsRefs[d], jsRefs[e]); jsRefs.push(r); return jsRefs.length - 1; },
+
+        // Method calls (0-5 args)
+        call_method_0: (o, m, l) => { const r = jsRefs[o][decode(m, l)](); jsRefs.push(r); return jsRefs.length - 1; },
+        call_method_1: (o, m, l, a) => { const r = jsRefs[o][decode(m, l)](jsRefs[a]); jsRefs.push(r); return jsRefs.length - 1; },
+        call_method_2: (o, m, l, a, b) => { const r = jsRefs[o][decode(m, l)](jsRefs[a], jsRefs[b]); jsRefs.push(r); return jsRefs.length - 1; },
+        call_method_3: (o, m, l, a, b, c) => { const r = jsRefs[o][decode(m, l)](jsRefs[a], jsRefs[b], jsRefs[c]); jsRefs.push(r); return jsRefs.length - 1; },
+        call_method_4: (o, m, l, a, b, c, d) => { const r = jsRefs[o][decode(m, l)](jsRefs[a], jsRefs[b], jsRefs[c], jsRefs[d]); jsRefs.push(r); return jsRefs.length - 1; },
+        call_method_5: (o, m, l, a, b, c, d, e) => { const r = jsRefs[o][decode(m, l)](jsRefs[a], jsRefs[b], jsRefs[c], jsRefs[d], jsRefs[e]); jsRefs.push(r); return jsRefs.length - 1; },
+
+        // Extract primitive from JsValue
+        to_f64: (idx) => Number(jsRefs[idx]),
+    }
+};
+
+const { instance } = await WebAssembly.instantiateStreaming(
+    fetch("module.wasm"),
+    jsImports
+);
+memory = instance.exports.memory;
+
+const rs = await toJs(instance);
+```
+
+### Rust Usage
+
+Use `JsValue` to work with JavaScript objects:
+
+```rust
+use to_js::{js, JsValue};
+
+#[js]
+fn log_to_console(message: &str) {
+    let console = JsValue::global().get("console");
+    let msg = JsValue::from(message);
+    console.call_method1("log", &msg);
+}
+
+#[js]
+fn get_window_width() -> f64 {
+    JsValue::global()
+        .get("window")
+        .get("innerWidth")
+        .as_f64()
+}
+
+#[js]
+fn set_element_text(element: JsValue, text: &str) {
+    element.set("textContent", &JsValue::from(text));
+}
+```
+
+### JsValue API
+
+- `JsValue::global()` - Returns `globalThis`
+- `JsValue::NULL` - The null reference (index 0)
+- `.get(key)` - Property access: `obj[key]`
+- `.set(key, val)` - Property assignment: `obj[key] = val`
+- `.call0()` through `.call5()` - Call as function with 0-5 arguments
+- `.call_method0(name)` through `.call_method5(name, ...)` - Call a method with 0-5 arguments
+- `.as_f64()` - Convert JS value to f64
+- `JsValue::from(f64)`, `JsValue::from(&str)`, `JsValue::from(bool)` - Convert Rust values to JS values
+
+When a `JsValue` is dropped, it releases its slot in the JavaScript-side table via the `release` import.
