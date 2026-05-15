@@ -23,7 +23,29 @@ macro_rules! impl_number {
     };
 }
 
-impl_number!(i8, i16, i32, u8, u16, u32, f32, f64, usize, isize);
+impl_number!(i8, i16, i32, u8, u16, u32, usize, isize);
+
+// f32 / f64 implement Number and ToWasm but NOT HasNiche: a user-returned NaN can
+// share the bit pattern of the HighBitsNaN niche (e.g. -f64::NAN has bits
+// 0xfff8000000000000, which is exactly the niche marker for `None`/`Err`), so
+// wrapping them in Option/Result would silently misdecode. Forcing Option<f64> /
+// Result<f64, E> to fail to compile is preferable to silent data corruption — users
+// who need an "optional float" can box-up a separate signal (an Option<u64> bit-cast,
+// a sentinel, or a Result with a non-NaN error type).
+impl Number for f32 {}
+impl Number for f64 {}
+
+impl ToWasm for f32 {
+    fn to_wasm(&self) -> Wasm {
+        Wasm(*self as f64)
+    }
+}
+
+impl ToWasm for f64 {
+    fn to_wasm(&self) -> Wasm {
+        Wasm(*self)
+    }
+}
 
 impl Number for u64 {}
 impl Number for i64 {}

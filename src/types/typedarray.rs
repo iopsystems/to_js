@@ -7,9 +7,20 @@ use crate::{IntoWasm, ToWasm, Wasm};
 // ToWasm and IntoWasm impl
 //
 
+// Empty slices have an `as_ptr()` of `align_of::<T>()` (the Rust "dangling" pointer).
+// For T = u8 / i8 that's `1`, which collides with the `LowBitsOne` niche encoding for
+// `None` / `Err` (which is `(low=1, high=0)`). To keep the niche values unique, we
+// force the pointer to 0 whenever the slice is empty — no caller can dereference an
+// empty slice, so this is observationally a no-op for valid uses, and it makes
+// `Some(&[]) as Option<&[u8]>` round-trip correctly.
+#[inline]
+fn slice_ptr<T>(len: usize, ptr: *const T) -> u32 {
+    if len == 0 { 0 } else { ptr as u32 }
+}
+
 impl<T: Number> ToWasm for &[T] {
     fn to_wasm(&self) -> Wasm {
-        U32Pair([self.as_ptr() as u32, self.len() as u32]).to_wasm()
+        U32Pair([slice_ptr(self.len(), self.as_ptr()), self.len() as u32]).to_wasm()
     }
 }
 
@@ -21,7 +32,7 @@ impl<T: Number> ToWasm for &Box<[T]> {
 
 impl<T: Number> IntoWasm for &mut [T] {
     fn into_wasm(self) -> Wasm {
-        U32Pair([self.as_mut_ptr() as u32, self.len() as u32]).to_wasm()
+        U32Pair([slice_ptr(self.len(), self.as_mut_ptr()), self.len() as u32]).to_wasm()
     }
 }
 

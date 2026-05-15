@@ -27,7 +27,7 @@ impl ToWasm for Json {
 // HasNiche impl
 
 impl HasNiche for Json {
-    const N: Niche = String::N;
+    const N: Niche = <&String>::N;
 }
 
 // TypeInfo impl

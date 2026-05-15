@@ -58,7 +58,12 @@ export function wrap(instance, alwaysCopyData) {
 
 	function cString(ptr) {
 		const bytes = new Uint8Array(instanceExports.memory.buffer, ptr);
-		const end = bytes.findIndex((d) => d === 0);
+		let end = bytes.findIndex((d) => d === 0);
+		// If no NUL terminator is found, findIndex returns -1; subarray(0, -1) would
+		// silently drop the last byte instead of reading to the end. Fall back to the
+		// full extent so malformed input surfaces a clean (if large) decode rather
+		// than off-by-one corruption.
+		if (end < 0) end = bytes.length;
 		return textDecoder.decode(bytes.subarray(0, end));
 	}
 
@@ -175,6 +180,12 @@ export function createClass(
 				methods.push(name.slice(prefix.length));
 			}
 		}
+	} else {
+		// If the user supplied `methods` explicitly, drop any "alloc" entry — exposing
+		// the allocator on the prototype would invoke `Class_alloc(this.ptr, ...args)`,
+		// double-allocating with `this.ptr` as the first arg. The inferred branch above
+		// already filters this; mirror that here so the two paths behave the same.
+		methods = methods.filter((name) => name !== "alloc");
 	}
 
 	// Ensure that "dealloc" is a method on the class

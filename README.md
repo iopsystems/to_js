@@ -244,7 +244,7 @@ struct TestStruct {
 
 #[js]
 fn test_json() -> Json {
-    Json::new(TestStruct {
+    Json::new(&TestStruct {
         x: 123,
         y: "456!".to_string(),
     })

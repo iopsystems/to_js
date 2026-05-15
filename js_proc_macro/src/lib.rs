@@ -38,10 +38,18 @@ impl Parse for JsArgs {
                     }
                     s.push('_');
                     name_prefix = Some(s);
+                } else {
+                    return Err(syn::Error::new(
+                        ident.span(),
+                        format!("unknown #[js] attribute: `{}`", ident),
+                    ));
                 }
-            }
-            if input.peek(syn::Token![,]) {
+            } else if input.peek(syn::Token![,]) {
                 let _comma: syn::Token![,] = input.parse()?;
+            } else {
+                // Neither an ident nor a comma — without this branch the loop would
+                // spin forever on inputs like `#[js(123)]` or `#[js(=)]`.
+                return Err(lookahead.error());
             }
         }
 
