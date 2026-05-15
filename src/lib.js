@@ -59,10 +59,6 @@ export function wrap(instance, alwaysCopyData) {
 	function cString(ptr) {
 		const bytes = new Uint8Array(instanceExports.memory.buffer, ptr);
 		let end = bytes.findIndex((d) => d === 0);
-		// If no NUL terminator is found, findIndex returns -1; subarray(0, -1) would
-		// silently drop the last byte instead of reading to the end. Fall back to the
-		// full extent so malformed input surfaces a clean (if large) decode rather
-		// than off-by-one corruption.
 		if (end < 0) end = bytes.length;
 		return textDecoder.decode(bytes.subarray(0, end));
 	}
@@ -73,8 +69,12 @@ export function wrap(instance, alwaysCopyData) {
 
 	// Implement decoding for both niche strategies
 	
+	// Upper 32 bits of the HighBitsNaN niche sentinel (see NICHE_NAN_BITS in niche.rs).
+	// Must match exactly; changing this requires updating the Rust constant in lockstep.
+	const NICHE_NAN_HI = 0xfff8face;
+
 	function tryResultHighBitsNaN(pair) {
-		if (pair[0] !== 0 && pair[1] === 0xfff80000) {
+		if (pair[0] !== 0 && pair[1] === NICHE_NAN_HI) {
 			throwError(pair[0]);
 		}
 	}
@@ -86,7 +86,7 @@ export function wrap(instance, alwaysCopyData) {
 	}
 
 	function tryOptionHighBitsNaN(pair) {
-		return pair[0] === 0 && pair[1] === 0xfff80000;
+		return pair[0] === 0 && pair[1] === NICHE_NAN_HI;
 	}
 
 	function tryOptionLowBitsOne(pair) {
@@ -181,10 +181,7 @@ export function createClass(
 			}
 		}
 	} else {
-		// If the user supplied `methods` explicitly, drop any "alloc" entry — exposing
-		// the allocator on the prototype would invoke `Class_alloc(this.ptr, ...args)`,
-		// double-allocating with `this.ptr` as the first arg. The inferred branch above
-		// already filters this; mirror that here so the two paths behave the same.
+		// Drop "alloc" so it isn't installed on the prototype (would double-allocate via this.ptr).
 		methods = methods.filter((name) => name !== "alloc");
 	}
 

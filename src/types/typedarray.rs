@@ -13,7 +13,6 @@ use crate::{IntoWasm, ToWasm, Wasm};
 // force the pointer to 0 whenever the slice is empty — no caller can dereference an
 // empty slice, so this is observationally a no-op for valid uses, and it makes
 // `Some(&[]) as Option<&[u8]>` round-trip correctly.
-#[inline]
 fn slice_ptr<T>(len: usize, ptr: *const T) -> u32 {
     if len == 0 { 0 } else { ptr as u32 }
 }

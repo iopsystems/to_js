@@ -7,8 +7,8 @@ use crate::Wasm;
 /// Each type that can be wrapped opts in to one of these strategies based on what niche it has
 /// available, so these types are declared here and imported in the individual types that use them.
 pub(crate) enum Niche {
-    /// Signal that we're inside the niche by setting the high bits to those of a signaling NaN,
-    /// and encode the associated value in the low bits.
+    /// Signal that we're inside the niche by setting the high bits to those of a specific quiet NaN
+    /// with a non-canonical mantissa payload, and encode the associated value in the low bits.
     HighBitsNaN,
 
     /// Signal that we're inside the niche by setting the low bits to 0x0001, and encode the associated
@@ -17,11 +17,19 @@ pub(crate) enum Niche {
     LowBitsOne,
 }
 
+/// The 64-bit pattern is a quiet NaN (sign=1, exponent=all-1s, high mantissa bit set) with an
+/// additional distinctive "face" payload baked into the high mantissa bits. No IEEE-754 arithmetic
+/// operation produces a NaN with these specific mantissa bits — only an explicit `f64::from_bits`
+/// could reproduce them — so the chance of a user-returned f64/f32 colliding with the niche is
+/// effectively zero in practice. The JS side preserves f64 NaN payloads exactly across the wasm/JS
+/// boundary and through typed-array overlays, so the upper 32 bits round-trip unchanged.
+/// If you change this value, also update the matching constant in `lib.js`.
+pub(crate) const NICHE_NAN_BITS: u64 = 0xfff8_face_0000_0000;
+
 impl Niche {
     pub(crate) fn new(self, x: u32) -> Wasm {
-        const SIGNALING_NAN: u64 = 0xfff80000_00000000;
         match self {
-            Self::HighBitsNaN => f64::from_bits(SIGNALING_NAN | x as u64).to_wasm(),
+            Self::HighBitsNaN => f64::from_bits(NICHE_NAN_BITS | x as u64).to_wasm(),
             Self::LowBitsOne => U32Pair([1, x]).to_wasm(),
         }
     }
